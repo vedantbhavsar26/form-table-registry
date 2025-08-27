@@ -69,9 +69,13 @@ type FormItemComponentProps<
 const getDefaultValue = (render: FieldType | FC<ControllerRenderProps>, label: string) => {
   if (typeof render === 'function') return `Enter ` + `${formatToTitleCase(label).toLowerCase()}`;
 
-  return ['suggest', 'select'].includes(render)
-    ? `Select ` + `${formatToTitleCase(label).toLowerCase()}`
-    : `Enter ` + `${formatToTitleCase(label).toLowerCase()}`;
+  if (['suggest', 'select', 'dateTime'].includes(render))
+    return `Select ` + `${formatToTitleCase(label).toLowerCase()}`;
+
+  if (['file'].includes(render))
+    return `Upload or Drop ` + `${formatToTitleCase(label).toLowerCase()}`;
+
+  return `Enter ` + `${formatToTitleCase(label).toLowerCase()}`;
 };
 
 export const FormItem = <

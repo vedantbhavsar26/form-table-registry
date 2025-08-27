@@ -8,11 +8,5 @@ export const TextAreaField: React.FC<
     cols?: number;
   }
 > = (field) => {
-  return (
-    <Textarea
-      {...field}
-      className='w-full p-2 border bg-secondary rounded-md'
-      placeholder={`Enter ${field.name}`}
-    />
-  );
+  return <Textarea className='w-full p-2 border bg-secondary rounded-md' {...field} />;
 };

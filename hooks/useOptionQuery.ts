@@ -11,9 +11,8 @@ export const useOptionQuery = (
   filter?: Record<string, unknown>,
 ) => {
   return useQuery({
-    queryKey: useOptionKey.name(name, filter || {}).queryKey,
+    queryKey: useOptionKey.name(name, { filter, fn: fn?.toString() }).queryKey,
     queryFn: async () => (await fn?.()) || [],
-    // remove duplicates
     select: (data) => [...new Set(data)],
     staleTime: 1000 * 60 * 60, // 1 hour
     refetchOnWindowFocus: false,

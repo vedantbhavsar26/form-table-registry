@@ -8,6 +8,7 @@ import {
   ImageUpIcon,
   Loader2,
   PlusIcon,
+  Replace,
   XIcon,
 } from 'lucide-react';
 
@@ -36,10 +37,15 @@ const getFileIcon = (fileType: string) => {
   return <FileIcon className='size-6' />;
 };
 
-export default function ImageDropZone(props: React.ComponentProps<'input'>) {
+interface ImageDropZoneProps {
+  display?: 'COMPACT' | 'FULL' | undefined;
+}
+
+export default function ImageDropZone(props: React.ComponentProps<'input'> & ImageDropZoneProps) {
   const maxSizeMB = 5;
   const maxSize = maxSizeMB * 1024 * 1024; // 5MB default
   const parsedValue = props.value as unknown as OneOrManyFile;
+  const isCompact = props.display === 'COMPACT';
 
   const [
     { files, isDragging, errors },
@@ -177,61 +183,169 @@ export default function ImageDropZone(props: React.ComponentProps<'input'>) {
   return (
     <div className='flex flex-col gap-2'>
       <div className='relative'>
-        <div
-          role='button'
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-          data-dragging={isDragging || undefined}
-          className='border-input hover:bg-accent/50 data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 relative flex min-h-52 flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors has-disabled:pointer-events-none has-disabled:opacity-50 has-[input:focus]:ring-[3px]'
-        >
-          <input
-            {...getInputProps()}
-            ref={(ref) => {
-              if (ref) {
-                // @ts-expect-error type error
-                getInputProps().ref.current = ref;
-                // @ts-expect-error type error
-                props.ref.current = ref;
-              }
-            }}
-            className='sr-only'
-            aria-label='Upload file'
-          />
-
-          {files.length > 0 ? (
-            files.length === 1 ? (
-              <div className='flex h-full w-full items-center justify-center'>
-                {renderFilePreview(files[0], 0)}
+        {isCompact ? (
+          <div
+            role='button'
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            data-dragging={isDragging || undefined}
+            className='border-input hover:bg-accent/50 data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 relative flex h-10 min-h-10 w-full items-center overflow-hidden rounded-md border border-dashed px-2 transition-colors has-disabled:pointer-events-none has-disabled:opacity-50 has-[input:focus]:ring-[3px]'
+          >
+            <input
+              {...getInputProps()}
+              ref={(ref) => {
+                if (ref) {
+                  // @ts-expect-error type error
+                  getInputProps().ref.current = ref;
+                  // @ts-expect-error type error
+                  props.ref.current = ref;
+                }
+              }}
+              className='sr-only'
+              aria-label='Upload file'
+            />
+            {files.length > 0 ? (
+              <div className='flex w-full items-center gap-2 overflow-x-auto'>
+                {files.map((file, index) => {
+                  const fileType = getFileType(file.file.type);
+                  return (
+                    <div
+                      key={file.id || index}
+                      className='bg-background inline-flex items-center gap-2 rounded-md border px-2 py-1 text-xs'
+                    >
+                      {fileType === 'image' ? (
+                        <div className='relative size-5 overflow-hidden rounded'>
+                          <Image
+                            src={file.preview || ''}
+                            alt={file.file?.name || 'Preview'}
+                            fill
+                            className='object-cover'
+                          />
+                        </div>
+                      ) : fileType === 'pdf' ? (
+                        <FileTextIcon className='size-4 text-red-500' />
+                      ) : (
+                        <FileIcon className='size-4' />
+                      )}
+                      <span className='max-w-[10rem] truncate'>{file.file?.name}</span>
+                      <button
+                        type='button'
+                        className='focus-visible:ring-ring/50 text-muted-foreground hover:bg-muted hover:text-foreground z-10 flex size-5 items-center justify-center rounded-full transition-[color,box-shadow] outline-none focus-visible:ring-[2px]'
+                        onClick={() => {
+                          if (file.id) {
+                            deleteMutation.mutate(file.id);
+                          } else {
+                            removeFile(index.toString());
+                          }
+                        }}
+                        aria-label='Remove file'
+                      >
+                        {deleteMutation.isPending && deleteMutation.variables === file.id ? (
+                          <Loader2 className='size-3.5 animate-spin' />
+                        ) : (
+                          <XIcon className='size-3.5' aria-hidden='true' />
+                        )}
+                      </button>
+                    </div>
+                  );
+                })}
+                <Button
+                  className={'text-xs'}
+                  variant={'secondary'}
+                  icon={
+                    props.multiple ? (
+                      <PlusIcon className='size-4' />
+                    ) : (
+                      <Replace className='size-4' />
+                    )
+                  }
+                  size={'xs2'}
+                  type={'button'}
+                  onClick={openFileDialog}
+                >
+                  {props.multiple ? 'Add Files' : 'Replace File'}
+                </Button>
               </div>
             ) : (
-              <div className='grid h-full w-full grid-cols-2 gap-2 sm:grid-cols-3'>
-                {files.map((file, index) => renderFilePreview(file, index))}
-              </div>
-            )
-          ) : (
-            <div
-              className='flex cursor-pointer flex-col items-center justify-center px-4 py-3 text-center'
-              onClick={openFileDialog}
-            >
               <div
-                className='bg-background mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border'
-                aria-hidden='true'
+                className='flex w-full cursor-pointer items-center gap-2'
+                onClick={openFileDialog}
               >
-                <ImageUpIcon className='size-4 opacity-60' />
+                <div
+                  className='bg-background flex size-7 shrink-0 items-center justify-center rounded border'
+                  aria-hidden='true'
+                >
+                  <ImageUpIcon className='size-4 opacity-60' />
+                </div>
+                <p className='text-muted-foreground truncate text-sm'>
+                  {props.placeholder || (
+                    <>Drop your {props.multiple ? 'files' : 'file'} here or click to browse</>
+                  )}
+                </p>
               </div>
-              <p className='mb-1.5 text-sm font-medium'>
-                Drop your {props.multiple ? 'files' : 'file'} here or click to browse
-              </p>
-              <p className='text-muted-foreground text-xs'>
-                Max size: {maxSizeMB}MB {props.multiple ? 'per file' : ''}
-              </p>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        ) : (
+          <div
+            role='button'
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            data-dragging={isDragging || undefined}
+            className='border-input hover:bg-accent/50 data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 relative flex min-h-52 flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors has-disabled:pointer-events-none has-disabled:opacity-50 has-[input:focus]:ring-[3px]'
+          >
+            <input
+              {...getInputProps()}
+              ref={(ref) => {
+                if (ref) {
+                  // @ts-expect-error type error
+                  getInputProps().ref.current = ref;
+                  // @ts-expect-error type error
+                  props.ref.current = ref;
+                }
+              }}
+              className='sr-only'
+              aria-label='Upload file'
+            />
+
+            {files.length > 0 ? (
+              files.length === 1 ? (
+                <div className='flex h-full w-full items-center justify-center'>
+                  {renderFilePreview(files[0], 0)}
+                </div>
+              ) : (
+                <div className='grid h-full w-full grid-cols-2 gap-2 sm:grid-cols-3'>
+                  {files.map((file, index) => renderFilePreview(file, index))}
+                </div>
+              )
+            ) : (
+              <div
+                className='flex cursor-pointer flex-col items-center justify-center px-4 py-3 text-center'
+                onClick={openFileDialog}
+              >
+                <div
+                  className='bg-background mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border'
+                  aria-hidden='true'
+                >
+                  <ImageUpIcon className='size-4 opacity-60' />
+                </div>
+                <p className='mb-1.5 text-sm font-medium'>
+                  {props.placeholder || (
+                    <>Drop your {props.multiple ? 'files' : 'file'} here or click to browse</>
+                  )}
+                </p>
+                <p className='text-muted-foreground text-xs'>
+                  Max size: {maxSizeMB}MB {props.multiple ? 'per file' : ''}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-      {props.multiple || files.length === 0 ? (
+      {!isCompact && (props.multiple || files.length === 0) ? (
         <div className='mb-2 flex justify-between'>
           <Button
             type={'button'}

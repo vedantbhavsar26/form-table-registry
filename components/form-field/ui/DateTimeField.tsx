@@ -30,7 +30,7 @@ export const DateTimeField: React.FC<
                 id='date-picker'
                 className='file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input bg-secondary w-full justify-between border font-normal'
               >
-                {date ? format(date, 'PPP') : 'Select date'}
+                {date ? format(date, 'PPP') : field.placeholder || 'Select date'}
                 <ChevronDownIcon />
               </Button>
             </PopoverTrigger>

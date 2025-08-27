@@ -14,7 +14,7 @@ import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/data-table/utils';
 import { FormControl } from '@/components/ui/form';
 import { CommandLoading } from 'cmdk';
-import { BaseFieldProps, Options, OptionType } from '@/lib/form-field/form-field';
+import { BaseFieldProps, Options } from '@/lib/form-field/form-field';
 import { useOptionQuery } from '@/hooks/useOptionQuery';
 import { createSyntheticInputChange } from '@/lib/form-field/utils';
 

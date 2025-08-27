@@ -1,5 +1,5 @@
 import { flexRender, type Table as TanstackTable } from '@tanstack/react-table';
-import type * as React from 'react';
+import React from 'react';
 
 import { DataTablePagination } from '@/components/data-table/data-table-pagination';
 import {
@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { cn } from '@/lib/data-table/utils';
+import { cn } from '@/lib/utils';
 import { getCommonPinningStyles } from '@/lib/data-table/utils';
 
 interface DataTableProps<TData> extends React.ComponentProps<'div'> {
@@ -20,7 +20,7 @@ interface DataTableProps<TData> extends React.ComponentProps<'div'> {
   showPagination?: boolean;
 }
 
-export function DataTable<TData>({
+function DataTableInner<TData>({
   table,
   actionBar,
   children,
@@ -87,3 +87,42 @@ export function DataTable<TData>({
     </div>
   );
 }
+
+function areEqual<TData>(prev: DataTableProps<TData>, next: DataTableProps<TData>) {
+  if (prev.table !== next.table) return false;
+  // Re-render when TanStack table state changes
+  if (prev.table.getState() !== next.table.getState()) return false;
+  if (prev.actionBar !== next.actionBar) return false;
+  if (prev.children !== next.children) return false;
+  if (prev.className !== next.className) return false;
+  if (prev.cellHeight !== next.cellHeight) return false;
+  if (prev.showPagination !== next.showPagination) return false;
+  // Shallow-equal other div props we spread
+  const {
+    table: _t1,
+    actionBar: _a1,
+    cellHeight: _c1,
+    showPagination: _s1,
+    className: _cl1,
+    children: _ch1,
+    ...restPrev
+  } = prev;
+  const {
+    table: _t2,
+    actionBar: _a2,
+    cellHeight: _c2,
+    showPagination: _s2,
+    className: _cl2,
+    children: _ch2,
+    ...restNext
+  } = next;
+  const prevKeys = Object.keys(restPrev);
+  const nextKeys = Object.keys(restNext);
+  if (prevKeys.length !== nextKeys.length) return false;
+  for (const key of prevKeys) {
+    if (restPrev[key as never] !== restNext[key as never]) return false;
+  }
+  return true;
+}
+
+export const DataTable = React.memo(DataTableInner, areEqual) as typeof DataTableInner;

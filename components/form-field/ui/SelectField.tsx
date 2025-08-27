@@ -8,23 +8,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { cn } from '@/lib/data-table/utils';
+import { cn, createSyntheticInputChange } from '@/lib/form-field/utils';
 import { useOptionQuery } from '@/hooks/useOptionQuery';
-import { createSyntheticInputChange } from '@/lib/form-field/utils';
 import { BaseFieldProps, OptionType } from '@/lib/form-field/form-field';
 
 export const SelectField: React.FC<
   BaseFieldProps & {
     options: OptionType;
     id?: string;
+    customOnChange?: (value: string) => void;
+    getOptionDisabled?: (value: string) => boolean;
     classNames?: {
       trigger?: string;
     };
   }
-> = ({ name, id = name, classNames, ...field }) => {
+> = ({ name, id = name, customOnChange, classNames, ...field }) => {
   const options = useOptionQuery(field.options, id);
   return (
-    <Select {...field} onValueChange={(e) => field.onChange(createSyntheticInputChange(name, e))}>
+    <Select
+      {...field}
+      onValueChange={(e) => {
+        field.onChange(createSyntheticInputChange(name, e));
+        customOnChange?.(e);
+      }}
+    >
       <SelectTrigger className={cn('bg-secondary w-full', classNames?.trigger)}>
         <SelectValue placeholder={field.placeholder} />
       </SelectTrigger>
@@ -41,7 +48,11 @@ export const SelectField: React.FC<
             </SelectItem>
           ) : (
             options.data?.map(({ value, label }) => (
-              <SelectItem key={value} value={value}>
+              <SelectItem
+                key={value}
+                value={value}
+                disabled={field.getOptionDisabled?.(value) || false}
+              >
                 {label}
               </SelectItem>
             ))

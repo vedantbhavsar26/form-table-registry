@@ -35,11 +35,16 @@ export const fieldComponents = {
 type FieldComponents = typeof fieldComponents;
 type keyofFieldComponents = keyof FieldComponents;
 
+export type fallBackType = {
+  disabled?: boolean;
+  className?: string;
+};
+
 export type WithProps<T extends keyofFieldComponents> =
   FieldComponents[T] extends React.FC<infer P>
     ? Omit<P, keyof BaseFieldProps> extends Record<string, never>
-      ? { disabled?: boolean }
-      : Omit<P, Exclude<keyof BaseFieldProps, 'disabled'>>
+      ? fallBackType
+      : Omit<P, keyof BaseFieldProps> & fallBackType
     : never;
 
 export type FieldType = keyof typeof fieldComponents;

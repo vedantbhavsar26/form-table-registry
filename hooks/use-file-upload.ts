@@ -112,7 +112,7 @@ export const useFileUpload = (
         });
 
         if (!isAccepted) {
-          return `File "${file instanceof File ? file.name : file.name}" is not an accepted file type.`;
+          return `File '${file instanceof File ? file.name : file.name}' is not an accepted file type.`;
         }
       }
 
