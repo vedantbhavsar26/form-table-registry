@@ -8,7 +8,7 @@ export default function PasswordField({
   display = 'FULL',
   ...props
 }: BaseFieldProps & {
-  display: 'FULL' | 'COMPACT';
+  display?: 'FULL' | 'COMPACT';
 }) {
   const id = useId();
   const [isVisible, setIsVisible] = useState<boolean>(false);
