@@ -67,15 +67,14 @@ type FormItemComponentProps<
   } & BaseFieldType;
 
 const getDefaultValue = (render: FieldType | FC<ControllerRenderProps>, label: string) => {
-  if (typeof render === 'function') return `Enter ` + `${formatToTitleCase(label).toLowerCase()}`;
+  if (typeof render === 'function') return `Enter ` + `${label.toLowerCase()}`;
 
   if (['suggest', 'select', 'dateTime'].includes(render))
-    return `Select ` + `${formatToTitleCase(label).toLowerCase()}`;
+    return `Select ` + `${label.toLowerCase()}`;
 
-  if (['file'].includes(render))
-    return `Upload or Drop ` + `${formatToTitleCase(label).toLowerCase()}`;
+  if (['file'].includes(render)) return `Upload or Drop ` + `${label.toLowerCase()}`;
 
-  return `Enter ` + `${formatToTitleCase(label).toLowerCase()}`;
+  return `Enter ` + `${label.toLowerCase()}`;
 };
 
 export const FormItem = <
@@ -85,7 +84,7 @@ export const FormItem = <
   control,
   name,
   description,
-  label = name,
+  label = formatToTitleCase(name),
   render = 'text',
   containerClassName,
   // @ts-expect-error type error

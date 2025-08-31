@@ -51,9 +51,11 @@ export const ComboboxField: React.FC<
               role='combobox'
               className={cn('justify-between', !field.value && 'text-muted-foreground')}
             >
-              {field.value
-                ? optionsQuery.data?.find((opt) => opt.value === field.value)?.label
-                : `Select ${field.name}`}
+              {field.value ? (
+                optionsQuery.data?.find((opt) => opt.value === field.value)?.label
+              ) : (
+                <span className={'max-w-32 truncate'}>Select {field.label}</span>
+              )}
               <ChevronsUpDown className='opacity-50' />
             </Button>
           </FormControl>
@@ -61,7 +63,7 @@ export const ComboboxField: React.FC<
         <PopoverContent className='p-0' align='start'>
           <Command>
             <CommandInput
-              placeholder={`Search ${field.name}...`}
+              placeholder={field.placeholder}
               className='h-9'
               onValueChange={(value) => {
                 debounceFN(value);
