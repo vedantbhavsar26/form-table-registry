@@ -1,12 +1,15 @@
 export async function getFile(fileId: string): Promise<File> {
-  throw new Error('Not implemented');
+  if (!fileId) return new File([], '');
+  return new File([], fileId);
 }
 
 export const getPublicFileUrl = async (fileId: string | undefined | null): Promise<string> => {
+  if (!fileId) return '';
   throw new Error('Not implemented');
 };
 
 const createBucket = async (name: string): Promise<string> => {
+  if (!name) return '';
   throw new Error('Not implemented');
 };
 
@@ -14,6 +17,7 @@ const createBucket = async (name: string): Promise<string> => {
  * Generates a unique filename for upload
  */
 const generateUniqueFileName = (file: File, directory: string): string => {
+  if (!file) return '';
   const originalName = file.name.replace(/\s+/g, '_');
   return `db_${directory}_${originalName}`;
 };
@@ -41,11 +45,11 @@ const uploadFile = async (
   file: File | undefined,
   directory: string,
 ): Promise<string | undefined> => {
-  throw new Error('Not implemented');
+  throw new Error('Not implemented', { cause: file + directory });
 };
 
 const deleteFile = async (fileId: string): Promise<void> => {
-  throw new Error('Not implemented');
+  throw new Error('Not implemented', { cause: fileId });
 };
 
 export { deleteFile, uploadFile };

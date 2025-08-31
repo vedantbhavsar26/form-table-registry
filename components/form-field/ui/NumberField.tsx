@@ -16,7 +16,8 @@ export const NumberField = ({
       {withControls && (
         <Button
           variant={'ghost'}
-          onClick={() => field.onChange(field.value - 1)}
+          type={'button'}
+          onClick={() => field.onChange(Number(field.value) - 1)}
           size={'sm'}
           className='text-muted-foreground  absolute inset-y-0 start-0 mr-2 flex h-full items-center justify-center ps-3 text-sm'
         >
@@ -32,9 +33,10 @@ export const NumberField = ({
       />
       {withControls && (
         <Button
+          type={'button'}
           variant={'ghost'}
           size={'sm'}
-          onClick={() => field.onChange(field.value + 1)}
+          onClick={() => field.onChange(Number(field.value) + 1)}
           className={cn(
             'text-muted-foreground  absolute inset-y-0 end-0  flex h-full items-center justify-center  text-sm',
             {
