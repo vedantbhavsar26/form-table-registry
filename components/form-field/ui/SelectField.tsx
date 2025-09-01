@@ -32,7 +32,7 @@ export const SelectField: React.FC<
         customOnChange?.(e);
       }}
     >
-      <SelectTrigger className={cn('bg-secondary w-full', classNames?.trigger)}>
+      <SelectTrigger className={cn(' w-full', field.className, classNames?.trigger)}>
         <SelectValue placeholder={field.placeholder} />
       </SelectTrigger>
       <SelectContent>

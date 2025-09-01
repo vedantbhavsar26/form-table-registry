@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/form-field/ui/button';
 import { OneOrManyFile } from '@/lib/form-field/zod-schemas/file';
 import { createSyntheticInputChange } from '@/lib/form-field/utils';
+import { cn } from '@/lib/utils';
 
 // Function to determine file type
 export const getFileType = (fileType: string | null): 'image' | 'pdf' | 'other' => {
@@ -41,7 +42,10 @@ interface ImageDropZoneProps {
   display?: 'COMPACT' | 'FULL' | undefined;
 }
 
-export default function ImageDropZone(props: React.ComponentProps<'input'> & ImageDropZoneProps) {
+export default function ImageDropZone({
+  className,
+  ...props
+}: React.ComponentProps<'input'> & ImageDropZoneProps) {
   const maxSizeMB = 5;
   const maxSize = maxSizeMB * 1024 * 1024; // 5MB default
   const parsedValue = props.value as unknown as OneOrManyFile;
@@ -181,7 +185,7 @@ export default function ImageDropZone(props: React.ComponentProps<'input'> & Ima
   };
 
   return (
-    <div className='flex flex-col gap-2'>
+    <div className={cn('flex flex-col gap-2 rounded-md', className)}>
       <div className='relative'>
         {isCompact ? (
           <div
@@ -346,7 +350,7 @@ export default function ImageDropZone(props: React.ComponentProps<'input'> & Ima
         )}
       </div>
       {!isCompact && (props.multiple || files.length === 0) ? (
-        <div className='mb-2 flex justify-between'>
+        <div className={cn('mb-2 flex justify-between ', className)}>
           <Button
             type={'button'}
             onClick={async () => {

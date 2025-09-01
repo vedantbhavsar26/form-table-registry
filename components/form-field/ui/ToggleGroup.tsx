@@ -36,7 +36,7 @@ export default function ToggleGroupComponent({
     >
       {optionsQuery.data.map((option) => (
         <ToggleGroupItem
-          className={cn('h-auto flex-1', itemClassName)}
+          className={cn('h-auto flex-1 p-2', itemClassName)}
           value={option.value}
           key={option.value}
         >

@@ -3,18 +3,20 @@ import { ControllerRenderProps } from 'react-hook-form';
 import { JSX, ReactNode } from 'react';
 
 export type baseOption = {
-  label: string | ReactNode;
+  label: string;
+  wrapperFn?: (label: string) => ReactNode;
   value: string;
   count?: number;
   icon?: React.FC<React.SVGProps<SVGSVGElement>>;
 };
 export type Options = Promise<baseOption[]> | baseOption[];
-export type OptionType = () => Options;
+export type OptionType = (q?: string) => Options;
 
 export type BaseFieldType = {
   label?: string;
   placeholder?: string;
   icon?: JSX.Element;
+  className?: string;
 };
 
 export type BaseFieldProps<

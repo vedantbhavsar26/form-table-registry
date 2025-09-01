@@ -9,7 +9,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { cn } from '@/lib/utils';
-import { fieldComponents, FieldType, fieldVariants, WithProps } from '@/lib/form-field/registry';
+import {
+  baseClassName,
+  fieldComponents,
+  FieldType,
+  fieldVariants,
+  WithProps,
+} from '@/lib/form-field/registry';
 import { BaseFieldType } from '@/lib/form-field/form-field';
 import { formatToTitleCase } from '@/lib/form-field/utils';
 
@@ -156,6 +162,7 @@ export const FormItem = <
                     {...field}
                     {...getProps()}
                     // @ts-expect-error type error
+                    className={baseClassName}
                     label={label}
                     placeholder={placeholder}
                   />

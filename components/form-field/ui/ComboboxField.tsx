@@ -21,15 +21,9 @@ import { createSyntheticInputChange } from '@/lib/form-field/utils';
 export const ComboboxField: React.FC<
   BaseFieldProps & {
     options: (searchQuery: string | undefined) => Options;
-    displayNoResultDuringSearch?: boolean;
     noResultFallBack?: React.ReactNode;
   }
-> = ({
-  noResultFallBack = 'No Result found.',
-  displayNoResultDuringSearch = true,
-  options: optionFn,
-  ...field
-}) => {
+> = ({ noResultFallBack = 'No Result found.', options: optionFn, ...field }) => {
   const [searchQuery, setSearchQuery] = useState<string>();
   const optionsQuery = useOptionQuery(() => optionFn(searchQuery), field.name, {
     q: searchQuery,
@@ -60,7 +54,7 @@ export const ComboboxField: React.FC<
             </Button>
           </FormControl>
         </PopoverTrigger>
-        <PopoverContent className='p-0' align='start'>
+        <PopoverContent className='w-[var(--radix-popover-trigger-width)] p-0' align='center'>
           <Command>
             <CommandInput
               placeholder={field.placeholder}
@@ -70,18 +64,6 @@ export const ComboboxField: React.FC<
               }}
             />
             <CommandList>
-              <CommandEmpty
-                className={cn(
-                  'bg-secondary m-2',
-                  buttonVariants({
-                    variant: 'ghost',
-                    size: 'sm',
-                    className: 'w-full',
-                  }),
-                )}
-              >
-                {noResultFallBack}
-              </CommandEmpty>
               {optionsQuery.isPending && (
                 <CommandLoading>
                   <div className={'flex items-center justify-center py-4'}>
@@ -89,6 +71,10 @@ export const ComboboxField: React.FC<
                   </div>
                 </CommandLoading>
               )}
+              {!optionsQuery.isPending && optionsQuery.data?.length === 0 ? (
+                <CommandEmpty>{noResultFallBack}</CommandEmpty>
+              ) : null}
+
               <CommandGroup>
                 {optionsQuery.data?.map((opt) => (
                   <CommandItem
@@ -112,20 +98,6 @@ export const ComboboxField: React.FC<
                   </CommandItem>
                 ))}
               </CommandGroup>
-              {displayNoResultDuringSearch && (
-                <CommandItem
-                  className={cn(
-                    'bg-secondary m-2',
-                    buttonVariants({
-                      variant: 'ghost',
-                      size: 'sm',
-                      className: 'w-full',
-                    }),
-                  )}
-                >
-                  {noResultFallBack}
-                </CommandItem>
-              )}
             </CommandList>
           </Command>
         </PopoverContent>

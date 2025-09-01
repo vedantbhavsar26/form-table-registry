@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { format } from 'date-fns';
 import { BaseFieldProps } from '@/lib/form-field/form-field';
 import { createSyntheticInputChange } from '@/lib/form-field/utils';
+import { cn } from '@/lib/utils';
 
 export const DateTimeField: React.FC<
   BaseFieldProps & {
@@ -26,9 +27,12 @@ export const DateTimeField: React.FC<
           <Popover>
             <PopoverTrigger asChild>
               <Button
-                variant='secondary'
+                variant='ghost'
                 id='date-picker'
-                className='file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input bg-secondary w-full justify-between border font-normal'
+                className={cn(
+                  'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input bg-secondary w-full justify-between border font-normal',
+                  field.className,
+                )}
               >
                 {date ? format(date, 'PPP') : field.placeholder || 'Select date'}
                 <ChevronDownIcon />
@@ -50,7 +54,7 @@ export const DateTimeField: React.FC<
         </div>
       )}
       {shouldDisplayTime && (
-        <div className='flex flex-1 flex-col gap-3'>
+        <div className={cn('flex flex-1 flex-col gap-3 rounded-md', field.className)}>
           <div className='relative grow'>
             <Input
               id={id}

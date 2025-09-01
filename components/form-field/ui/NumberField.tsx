@@ -12,7 +12,7 @@ export const NumberField = ({
   withControls?: boolean;
 }) => {
   return (
-    <div className='relative z-10 flex items-center rounded-md shadow-xs'>
+    <div className={cn('relative z-10 flex items-center rounded-md shadow-xs', field.className)}>
       {withControls && (
         <Button
           variant={'ghost'}

@@ -1,135 +1,123 @@
-'use client';
-
-import { Button } from '@/components/form-field/ui/button';
+import { cn } from '@/lib/utils';
+import { Command as CommandPrimitive } from 'cmdk';
+import { Check, Loader2 } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover';
 import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/data-table/utils';
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
-import * as React from 'react';
-import { useEffect, useState } from 'react';
-import { omit } from 'lodash-es';
-import { BaseFieldProps, baseOption, OptionType } from '@/lib/form-field/form-field';
-import { createSyntheticInputChange } from '@/lib/form-field/utils';
+import { Input } from '@/components/ui/input';
+import { BaseFieldProps, OptionType } from '@/lib/form-field/form-field';
 import { useOptionQuery } from '@/hooks/useOptionQuery';
-
-export function SuggestInput({
-  name,
-  id = name,
-  ...props
-}: BaseFieldProps & {
+import { createSyntheticInputChange } from '@/lib/form-field/utils';
+type Props<T extends string> = BaseFieldProps & {
+  selectedValue: T;
   options: OptionType;
-  id?: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const [inputValue, setInputValue] = useState<string>('');
-  const [suggestions, setSuggestions] = useState<baseOption[]>([]);
+  emptyMessage?: string;
+  shouldCloseOnNoItems?: boolean;
+};
 
-  const setValue = (value: string) => {
-    props.onChange?.(createSyntheticInputChange(name, value));
-    setOpen(false); // Close popover after selecting an item
+export function SuggestInput<T extends string>({
+  selectedValue,
+  onChange,
+  name,
+  value,
+  shouldCloseOnNoItems = true,
+  options,
+  emptyMessage = 'No items.',
+  placeholder = 'Search...',
+  ...fields
+}: Props<T>) {
+  const [open, setOpen] = useState(false);
+  const items = useOptionQuery(() => options(value), name, { q: value });
+
+  const labels = useMemo(
+    () =>
+      items.data?.reduce(
+        (acc, item) => {
+          acc[item.value] = item.label;
+          return acc;
+        },
+        {} as Record<string, string>,
+      ),
+    [items],
+  );
+
+  const onSelectItem = (inputValue: string, isSelecting?: boolean) => {
+    onChange(createSyntheticInputChange(name, inputValue));
+    if (isSelecting) {
+      setOpen(false);
+    }
   };
 
-  const { data, isPending } = useOptionQuery(props.options, id);
-
-  useEffect(() => {
-    setSuggestions((prev) => [...prev, ...(data || [])]);
-  }, [data]);
-
-  const mappedSuggestions = suggestions.map((suggestion) => ({
-    value: suggestion.value || 'no-value-found',
-    label: suggestion.label || 'No Suggestion Found',
-  }));
-
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild className={'!w-full'}>
-        <span className={'w-full'}>
-          <Button
-            variant='outline'
-            role='combobox'
-            type='button'
-            disabled={isPending}
-            aria-expanded={open}
-            className={cn('bg-secondary flex w-full justify-between', {
-              '!text-muted-foreground': !props.value,
-            })}
-            onClick={() => setOpen((prev) => !prev)} // Toggle popover on click
+    <div className='flex items-center'>
+      <Popover open={open} onOpenChange={setOpen}>
+        <Command shouldFilter={false}>
+          <PopoverAnchor asChild>
+            <CommandPrimitive.Input
+              asChild
+              value={labels?.[value]}
+              onValueChange={onSelectItem}
+              onKeyDown={(e) => setOpen(e.key !== 'Escape')}
+              onMouseDown={() => setOpen((open) => !!value || !open)}
+              onFocus={() => setOpen(true)}
+              {...fields}
+            >
+              <Input placeholder={placeholder} />
+            </CommandPrimitive.Input>
+          </PopoverAnchor>
+          {!open && <CommandList aria-hidden='true' className='hidden' />}
+
+          <PopoverContent
+            asChild
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            onInteractOutside={(e) => {
+              if (e.target instanceof Element && e.target.hasAttribute('cmdk-input')) {
+                e.preventDefault();
+              }
+            }}
+            className='w-[var(--radix-popover-trigger-width)] p-0'
           >
-            {isPending ? (
-              <Loader2 className='mx-auto w-full animate-spin' />
-            ) : (
-              <>
-                {props.value
-                  ? mappedSuggestions?.find((item) => item.value === props.value)?.label
-                  : props.placeholder}
-                <ChevronsUpDown className='opacity-50' />
-              </>
-            )}
-          </Button>
-        </span>
-      </PopoverTrigger>
-      <PopoverContent className='!w-full p-2'>
-        <Command>
-          <CommandInput
-            {...omit(props, ['key'])}
-            placeholder={props.placeholder}
-            value={inputValue}
-            onValueChange={setInputValue}
-          />
-          <CommandList>
-            <CommandEmpty>
-              <div className='grid gap-1 text-center'>
-                <span>No results found.</span>
-                {inputValue && (
-                  <Button
-                    type='submit'
-                    size='sm'
-                    variant={'secondary'}
-                    onClick={() => {
-                      if (inputValue.trim()) {
-                        setValue(inputValue);
-                        setSuggestions((prev) => [
-                          ...prev,
-                          {
-                            value: inputValue,
-                            label: inputValue,
-                          },
-                        ]);
-                      }
-                    }}
-                  >
-                    Click to create a new item.
-                  </Button>
-                )}
-              </div>
-            </CommandEmpty>
-            <CommandGroup>
-              {mappedSuggestions?.map((item, index) => (
-                <CommandItem
-                  key={item.value + index}
-                  className=''
-                  onSelect={() => setValue(item.value)} // Ensure value is selected & popover closes
-                >
-                  {item.label}
-                  <Check
-                    className={cn(
-                      'ml-auto',
-                      props.value === item.value ? 'opacity-100' : 'opacity-0',
-                    )}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
+            <CommandList>
+              {items.isPending && (
+                <CommandPrimitive.Loading>
+                  <div className='p-4 flex justify-center items-center gap-1'>
+                    <Loader2 className={'animate-spin'} size={18} /> Loading...
+                  </div>
+                </CommandPrimitive.Loading>
+              )}
+              {(items.data?.length || 0) > 0 && !items.isPending ? (
+                <CommandGroup>
+                  {items.data?.map((option) => (
+                    <CommandItem
+                      key={option.value}
+                      value={option.value}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onSelect={(value) => onSelectItem(value, true)}
+                    >
+                      <Check
+                        className={cn(
+                          'mr-2 h-4 w-4',
+                          selectedValue === option.value ? 'opacity-100' : 'opacity-0',
+                        )}
+                      />
+                      {option.label}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              ) : null}
+              {!items.isPending && !shouldCloseOnNoItems ? (
+                <CommandEmpty>{emptyMessage ?? 'No items.'}</CommandEmpty>
+              ) : null}
+            </CommandList>
+          </PopoverContent>
         </Command>
-      </PopoverContent>
-    </Popover>
+      </Popover>
+    </div>
   );
 }

@@ -7,6 +7,7 @@ export default function SuffixInputField({
   prefix = '₹',
   suffix = 'INR',
   type = 'number',
+  className,
   ...props
 }: React.ComponentProps<'input'> & {
   prefix?: string;
@@ -22,7 +23,7 @@ export default function SuffixInputField({
       </span>
       <Input
         id={id}
-        className='-me-px h-full min-h-9 rounded-e-none ps-8 shadow-none'
+        className={cn('-me-px h-full min-h-9 !rounded-e-none ps-8 shadow-none', className)}
         type={type}
         placeholder='0.00'
         {...props}
