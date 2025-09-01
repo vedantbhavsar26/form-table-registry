@@ -4,9 +4,8 @@ import { JSX, ReactNode } from 'react';
 
 export type baseOption = {
   label: string;
-  wrapperFn?: (label: string) => ReactNode;
+  wrapperFn?: (props: Omit<baseOption, 'wrapperFn'>) => ReactNode;
   value: string;
-  count?: number;
   icon?: React.FC<React.SVGProps<SVGSVGElement>>;
 };
 export type Options = Promise<baseOption[]> | baseOption[];

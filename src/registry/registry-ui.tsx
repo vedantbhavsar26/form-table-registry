@@ -29,6 +29,7 @@ export const registryUi: Registry['items'] = [
       // Hooks
       { path: 'hooks/use-file-upload.ts', type: 'registry:hook' },
       { path: 'hooks/useOptionQuery.ts', type: 'registry:hook' },
+      { path: 'hooks/useDebounceState.tsx', type: 'registry:hook' },
 
       // Lib (form-field)
       { path: 'lib/form-field/form.tsx', type: 'registry:lib' },

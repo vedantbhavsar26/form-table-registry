@@ -4,6 +4,72 @@ import { useForm } from 'react-hook-form';
 import { Form } from '@/lib/form-field/form';
 import { FormItem } from '@/lib/form-field/formItem';
 import { fieldComponents } from '@/lib/form-field/registry';
+import {
+  Home,
+  User,
+  Users,
+  Settings,
+  Search,
+  Bell,
+  Mail,
+  Phone,
+  Calendar,
+  Clock,
+  FileText,
+  Folder,
+  Book,
+  Camera,
+  Music,
+  Video,
+  Image,
+  Map,
+  Globe,
+  ShoppingCart,
+  CreditCard,
+  DollarSign,
+  Package,
+  Truck,
+  Heart,
+  Star,
+  Shield,
+  Lock,
+  Cpu,
+  Code,
+} from 'lucide-react';
+import { baseOption, OptionType } from '@/lib/form-field/form-field';
+
+const opts: baseOption[] = [
+  { label: 'Home', value: 'home', icon: Home },
+  { label: 'Profile', value: 'profile', icon: User },
+  { label: 'Team', value: 'team', icon: Users },
+  { label: 'Settings', value: 'settings', icon: Settings },
+  { label: 'Search', value: 'search', icon: Search },
+  { label: 'Notifications', value: 'notifications', icon: Bell },
+  { label: 'Messages', value: 'messages', icon: Mail },
+  { label: 'Calls', value: 'calls', icon: Phone },
+  { label: 'Calendar', value: 'calendar', icon: Calendar },
+  { label: 'Time', value: 'time', icon: Clock },
+  { label: 'Documents', value: 'documents', icon: FileText },
+  { label: 'Folders', value: 'folders', icon: Folder },
+  { label: 'Library', value: 'library', icon: Book },
+  { label: 'Camera', value: 'camera', icon: Camera },
+  { label: 'Music', value: 'music', icon: Music },
+  { label: 'Videos', value: 'videos', icon: Video },
+  { label: 'Images', value: 'images', icon: Image },
+  { label: 'Map', value: 'map', icon: Map },
+  { label: 'World', value: 'world', icon: Globe },
+  { label: 'Cart', value: 'cart', icon: ShoppingCart },
+  { label: 'Payments', value: 'payments', icon: CreditCard },
+  { label: 'Finance', value: 'finance', icon: DollarSign },
+  { label: 'Inventory', value: 'inventory', icon: Package },
+  { label: 'Delivery', value: 'delivery', icon: Truck },
+  { label: 'Favorites', value: 'favorites', icon: Heart },
+  { label: 'Ratings', value: 'ratings', icon: Star },
+  { label: 'Security', value: 'security', icon: Shield },
+  { label: 'Privacy', value: 'privacy', icon: Lock },
+  { label: 'Hardware', value: 'hardware', icon: Cpu },
+  { label: 'Code', value: 'code', icon: Code },
+].map((e) => ({ ...e, count: Math.floor(Math.random() * 100) }));
 
 export function FormPanel() {
   const form = useForm();
@@ -13,70 +79,42 @@ export function FormPanel() {
   const options = {
     select: {
       options: async (q) => {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        const opts = [
-          { value: '1', label: 'Option 1' },
-          { value: '2', label: 'Option 2' },
-          { value: '3', label: 'Option 3' },
-          { value: '4', label: 'Option 4' },
-          { value: '5', label: 'Option 5' },
-          { value: '6', label: 'Option 6' },
-          { value: '7', label: 'Option 7' },
-        ];
+        await new Promise((resolve) => setTimeout(resolve, 100));
         if (q) return opts.filter((e) => e.label.includes(q));
         return opts;
       },
     },
     combobox: {
       options: async (q) => {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        const opts = [
-          { value: '1', label: 'Option 1' },
-          { value: '2', label: 'Option 2' },
-          { value: '3', label: 'Option 3' },
-          { value: '4', label: 'Option 4' },
-          { value: '5', label: 'Option 5' },
-          { value: '6', label: 'Option 6' },
-          { value: '7', label: 'Option 7' },
-        ];
-        if (q) return opts.filter((e) => e.label.toLowerCase().includes(q.toLowerCase()));
-        return opts;
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        if (q) return opts.filter((e) => e.label.toLowerCase().startsWith(q.toLowerCase()));
+        return [];
       },
     },
     suggest: {
       options: async (q) => {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        const opts = [
-          { value: '1', label: 'Option 1' },
-          { value: '2', label: 'Option 2' },
-          { value: '3', label: 'Option 3' },
-          { value: '4', label: 'Option 4' },
-          { value: '5', label: 'Option 5' },
-          { value: '6', label: 'Option 6' },
-          { value: '7', label: 'Option 7' },
-        ];
-        if (q) return opts.filter((e) => e.label.includes(q));
-        return opts;
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        if (q) return opts.filter((e) => e.label.toLowerCase().startsWith(q.toLowerCase()));
+        return [];
       },
       shouldCloseOnNoItems: true,
     },
     toggle: {
       options: async (q) => {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        const opts = [
-          { value: '1', label: 'Option 1' },
-          { value: '2', label: 'Option 2' },
-          { value: '3', label: 'Option 3' },
-          { value: '4', label: 'Option 4' },
-          { value: '5', label: 'Option 5' },
-          { value: '6', label: 'Option 6' },
-          { value: '7', label: 'Option 7' },
-        ];
+        await new Promise((resolve) => setTimeout(resolve, 100));
         if (q) return opts.filter((e) => e.label.includes(q));
         return opts;
       },
     },
-  } satisfies Partial<Record<keyof typeof fieldComponents, Record<string, unknown>>>;
+  } satisfies Partial<
+    Record<
+      keyof typeof fieldComponents,
+      {
+        options: OptionType;
+        shouldCloseOnNoItems?: boolean;
+      }
+    >
+  >;
 
   return (
     <Form {...form} className={'mx-auto container grid grid-cols-3 gap-2 py-20'}>

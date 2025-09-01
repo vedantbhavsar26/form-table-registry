@@ -47,13 +47,21 @@ export const SelectField: React.FC<
               Error loading options
             </SelectItem>
           ) : (
-            options.data?.map(({ value, label }) => (
+            options.data?.map(({ value, label, icon: Icon, wrapperFn }) => (
               <SelectItem
                 key={value}
                 value={value}
                 disabled={field.getOptionDisabled?.(value) || false}
               >
-                {label}
+                {wrapperFn ? (
+                  wrapperFn({ label, icon: Icon, value })
+                ) : (
+                  <div className={'flex items-center gap-2  justify-between w-full  '}>
+                    <span className={'flex items-center gap-2'}>
+                      {Icon && <Icon />} {label}
+                    </span>
+                  </div>
+                )}
               </SelectItem>
             ))
           )}

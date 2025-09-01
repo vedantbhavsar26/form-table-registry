@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import {
   Dialog,
   DialogClose,
@@ -8,10 +8,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
-import type { ReactNode } from "react";
-import { useMemo, useRef, useState } from "react";
+} from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
+import type { ReactNode } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 // Define comprehensive prop types for better type safety
 export type DialogPanelProps = {
@@ -73,50 +73,42 @@ export function DialogPanel({
     }
     onOpenChange?.(newOpen);
   };
-  const child = useMemo(() => typeof children === "function" ? children(() => dialogCloseRef.current?.click()) : children, [children]);
+  const child = useMemo(
+    () =>
+      typeof children === 'function' ? children(() => dialogCloseRef.current?.click()) : children,
+    [children],
+  );
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger
-        className={cn("cursor-pointer", triggerClassName)}
-        asChild={asChild ?? typeof triggerText !== "string"}
+        className={cn('cursor-pointer', triggerClassName)}
+        asChild={asChild ?? typeof triggerText !== 'string'}
       >
         {triggerText}
       </DialogTrigger>
       <DialogContent
-        className={cn("!max-w-4xl !max-h-[95vh] overflow-y-scroll", contentClassName)}
+        className={cn('!max-w-4xl !max-h-[95vh] overflow-y-scroll', contentClassName)}
         {...contentProps}
       >
         <DialogClose hidden={true} ref={dialogCloseRef} />
         {showCloseButton && (
-          <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-            <span className="h-4 w-4">×</span>
-            <span className="sr-only">Close</span>
+          <DialogClose className='absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground'>
+            <span className='h-4 w-4'>×</span>
+            <span className='sr-only'>Close</span>
           </DialogClose>
         )}
 
         {(dialogTitle || dialogDescription) && (
           <DialogHeader>
-            {dialogTitle && (
-              <DialogTitle>
-                {dialogTitle}
-              </DialogTitle>
-            )}
-            {dialogDescription && (
-              <DialogDescription>
-                {dialogDescription}
-              </DialogDescription>
-            )}
+            {dialogTitle && <DialogTitle>{dialogTitle}</DialogTitle>}
+            {dialogDescription && <DialogDescription>{dialogDescription}</DialogDescription>}
           </DialogHeader>
         )}
 
         {child}
 
-        {footer && (
-          <DialogFooter>
-            {footer}
-          </DialogFooter>
-        )}
+        {footer && <DialogFooter>{footer}</DialogFooter>}
       </DialogContent>
     </Dialog>
   );

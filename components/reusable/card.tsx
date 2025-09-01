@@ -1,10 +1,15 @@
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import type {
-  DialogContent,
-} from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
-import type { ReactNode } from "react";
-import React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import type { DialogContent } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
+import type { ReactNode } from 'react';
+import React from 'react';
 
 // Define comprehensive prop types for better type safety
 export type DialogPanelProps = {
@@ -47,28 +52,15 @@ export function CardPanel({
   cardClassName,
 }: DialogPanelProps) {
   return (
-    <Card className={cn(cardClassName, "flex flex-col justify-between")}>
+    <Card className={cn(cardClassName, 'flex flex-col justify-between')}>
       <CardHeader>
-        <CardTitle className={titleClassName}>
-          {" "}
-          {cardTitle}
-        </CardTitle>
-        <CardDescription>
-          {" "}
-          {cardDescription}
-        </CardDescription>
+        <CardTitle className={titleClassName}> {cardTitle}</CardTitle>
+        <CardDescription> {cardDescription}</CardDescription>
       </CardHeader>
-      <CardContent
-        className={cn(contentClassName)}
-        {...contentProps}
-      >
+      <CardContent className={cn(contentClassName)} {...contentProps}>
         {children}
       </CardContent>
-      {footer && (
-        <CardFooter>
-          {footer}
-        </CardFooter>
-      )}
+      {footer && <CardFooter>{footer}</CardFooter>}
     </Card>
   );
 }

@@ -27,20 +27,30 @@ export default function ToggleGroupComponent({
     <ToggleGroup
       type='single'
       variant='outline'
-      className={cn('w-full overflow-x-auto', className)}
+      className={cn('w-full flex flex-wrap overflow-x-auto', className)}
       {...props}
       value={props.value}
       onValueChange={(value) => {
         if (value) props.onChange?.(value);
       }}
     >
-      {optionsQuery.data.map((option) => (
+      {optionsQuery.data.map(({ label, icon: Icon, value, wrapperFn }) => (
         <ToggleGroupItem
-          className={cn('h-auto flex-1 p-2', itemClassName)}
-          value={option.value}
-          key={option.value}
+          className={cn('rounded-md p-2 min-w-max', itemClassName, {
+            'text-muted-foreground': props.value !== value,
+          })}
+          value={value}
+          key={value}
         >
-          {option.label}
+          {wrapperFn ? (
+            wrapperFn({ label, icon: Icon, value })
+          ) : (
+            <div className={'flex items-center gap-2  justify-between w-full  '}>
+              <span className={'flex items-center gap-2'}>
+                {Icon && <Icon />} {label}
+              </span>
+            </div>
+          )}
         </ToggleGroupItem>
       ))}
     </ToggleGroup>

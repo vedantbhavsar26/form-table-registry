@@ -114,6 +114,10 @@
           "type": "registry:hook"
         },
         {
+          "path": "hooks/useDebounceState.tsx",
+          "type": "registry:hook"
+        },
+        {
           "path": "lib/form-field/form.tsx",
           "type": "registry:lib"
         },

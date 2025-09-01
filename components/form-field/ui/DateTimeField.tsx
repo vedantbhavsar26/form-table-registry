@@ -30,8 +30,11 @@ export const DateTimeField: React.FC<
                 variant='ghost'
                 id='date-picker'
                 className={cn(
-                  'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input bg-secondary w-full justify-between border font-normal',
+                  'file:text-foreground  placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input bg-secondary w-full justify-between border font-normal',
                   field.className,
+                  {
+                    'text-muted-foreground': !field.value,
+                  },
                 )}
               >
                 {date ? format(date, 'PPP') : field.placeholder || 'Select date'}
@@ -54,7 +57,11 @@ export const DateTimeField: React.FC<
         </div>
       )}
       {shouldDisplayTime && (
-        <div className={cn('flex flex-1 flex-col gap-3 rounded-md', field.className)}>
+        <div
+          className={cn('flex flex-1 flex-col gap-3 rounded-md', field.className, {
+            'text-muted-foreground': !field.value,
+          })}
+        >
           <div className='relative grow'>
             <Input
               id={id}

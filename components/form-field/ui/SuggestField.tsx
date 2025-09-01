@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Command as CommandPrimitive } from 'cmdk';
 import { Check, Loader2 } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import React, { ReactNode, useMemo, useRef, useState } from 'react';
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover';
 import {
   Command,
@@ -11,14 +11,16 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
-import { BaseFieldProps, OptionType } from '@/lib/form-field/form-field';
+import { BaseFieldProps, baseOption, OptionType } from '@/lib/form-field/form-field';
 import { useOptionQuery } from '@/hooks/useOptionQuery';
 import { createSyntheticInputChange } from '@/lib/form-field/utils';
+import { buttonVariants } from '@/components/form-field/ui/button';
+import { useDebounceState } from '@/hooks/useDebounceState';
 type Props<T extends string> = BaseFieldProps & {
   selectedValue: T;
+
   options: OptionType;
-  emptyMessage?: string;
-  shouldCloseOnNoItems?: boolean;
+  fallbackFn?: (value: string) => ReactNode;
 };
 
 export function SuggestInput<T extends string>({
@@ -26,32 +28,47 @@ export function SuggestInput<T extends string>({
   onChange,
   name,
   value,
-  shouldCloseOnNoItems = true,
   options,
-  emptyMessage = 'No items.',
+  fallbackFn,
   placeholder = 'Search...',
   ...fields
 }: Props<T>) {
   const [open, setOpen] = useState(false);
-  const items = useOptionQuery(() => options(value), name, { q: value });
+  const [searchQuery, setSearchQuery] = useDebounceState<string>();
+  const items = useOptionQuery(() => options(searchQuery), name, { q: searchQuery });
+  const [customOptions, setCustomOptions] = useState<baseOption[]>([]);
+  const ref = useRef<HTMLInputElement>(null);
+
+  const opts = useMemo(
+    () => [
+      ...customOptions.filter((e) => e.value.startsWith(searchQuery || '')),
+      ...(items.data || []),
+    ],
+    [customOptions, items.data, searchQuery],
+  );
 
   const labels = useMemo(
     () =>
-      items.data?.reduce(
+      opts?.reduce(
         (acc, item) => {
           acc[item.value] = item.label;
           return acc;
         },
         {} as Record<string, string>,
       ),
-    [items],
+    [opts],
   );
+  const [customValue, setCustomValue] = useState<string>(labels?.[value]);
 
-  const onSelectItem = (inputValue: string, isSelecting?: boolean) => {
+  const onSelectItem = (inputValue: string, isNew: boolean = false) => {
     onChange(createSyntheticInputChange(name, inputValue));
-    if (isSelecting) {
-      setOpen(false);
+    if (isNew) {
+      setCustomOptions((prev) => [...prev, { label: inputValue, value: inputValue }]);
+      setCustomValue(inputValue);
+    } else {
+      setCustomValue(labels?.[inputValue]);
     }
+    setOpen(false);
   };
 
   return (
@@ -61,12 +78,17 @@ export function SuggestInput<T extends string>({
           <PopoverAnchor asChild>
             <CommandPrimitive.Input
               asChild
-              value={labels?.[value]}
-              onValueChange={onSelectItem}
+              defaultValue={customValue}
+              value={customValue}
+              onValueChange={(v) => {
+                setCustomValue(v);
+                setSearchQuery(v);
+              }}
               onKeyDown={(e) => setOpen(e.key !== 'Escape')}
               onMouseDown={() => setOpen((open) => !!value || !open)}
               onFocus={() => setOpen(true)}
               {...fields}
+              ref={ref}
             >
               <Input placeholder={placeholder} />
             </CommandPrimitive.Input>
@@ -91,28 +113,54 @@ export function SuggestInput<T extends string>({
                   </div>
                 </CommandPrimitive.Loading>
               )}
-              {(items.data?.length || 0) > 0 && !items.isPending ? (
+              {(opts?.length || 0) > 0 && !items.isPending ? (
                 <CommandGroup>
-                  {items.data?.map((option) => (
+                  {opts?.map(({ label, value, icon: Icon, wrapperFn }) => (
                     <CommandItem
-                      key={option.value}
-                      value={option.value}
+                      key={value}
+                      value={value}
                       onMouseDown={(e) => e.preventDefault()}
-                      onSelect={(value) => onSelectItem(value, true)}
+                      onSelect={(value) => onSelectItem(value)}
                     >
                       <Check
                         className={cn(
                           'mr-2 h-4 w-4',
-                          selectedValue === option.value ? 'opacity-100' : 'opacity-0',
+                          selectedValue === value ? 'opacity-100' : 'opacity-0',
                         )}
                       />
-                      {option.label}
+                      {wrapperFn ? (
+                        wrapperFn({ label, icon: Icon, value })
+                      ) : (
+                        <div className={'flex items-center gap-2  justify-between w-full  '}>
+                          <span className={'flex items-center gap-2'}>
+                            {Icon && <Icon />} {label}
+                          </span>
+                        </div>
+                      )}
                     </CommandItem>
                   ))}
                 </CommandGroup>
               ) : null}
-              {!items.isPending && !shouldCloseOnNoItems ? (
-                <CommandEmpty>{emptyMessage ?? 'No items.'}</CommandEmpty>
+              {!items.isPending ? (
+                searchQuery ? (
+                  fallbackFn ? (
+                    fallbackFn(searchQuery)
+                  ) : (
+                    <CommandEmpty
+                      className={buttonVariants({
+                        variant: 'secondary',
+                        className: 'w-full cursor-pointer',
+                      })}
+                      onClick={() => {
+                        onSelectItem(searchQuery, true);
+                      }}
+                    >
+                      create &quot;{searchQuery}&quot;
+                    </CommandEmpty>
+                  )
+                ) : (
+                  <CommandEmpty>Search {fields.label}</CommandEmpty>
+                )
               ) : null}
             </CommandList>
           </PopoverContent>

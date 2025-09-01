@@ -43,7 +43,11 @@ export const ComboboxField: React.FC<
             <Button
               variant='outline'
               role='combobox'
-              className={cn('justify-between', !field.value && 'text-muted-foreground')}
+              className={cn(
+                'justify-between ',
+                field.className,
+                !field.value && 'text-muted-foreground',
+              )}
             >
               {field.value ? (
                 optionsQuery.data?.find((opt) => opt.value === field.value)?.label
@@ -76,24 +80,26 @@ export const ComboboxField: React.FC<
               ) : null}
 
               <CommandGroup>
-                {optionsQuery.data?.map((opt) => (
+                {optionsQuery.data?.map(({ label, value, icon: Icon, wrapperFn }) => (
                   <CommandItem
-                    value={opt.label?.toString()}
-                    key={opt.value}
+                    value={label}
+                    key={value}
+                    className={' *:w-full'}
                     onSelect={() => {
-                      field.onChange(createSyntheticInputChange(field.name, opt.value));
+                      field.onChange(createSyntheticInputChange(field.name, value));
                     }}
                   >
-                    <span>
-                      {opt.icon && <opt.icon />}
-                      {opt.label}
-                    </span>
-                    <span>{opt.count && `(${opt.count})`}</span>
+                    {wrapperFn ? (
+                      wrapperFn({ label, icon: Icon, value })
+                    ) : (
+                      <div className={'flex items-center gap-2  justify-between w-full  '}>
+                        <span className={'flex items-center gap-2'}>
+                          {Icon && <Icon />} {label}
+                        </span>
+                      </div>
+                    )}
                     <Check
-                      className={cn(
-                        'ml-auto',
-                        opt.value === field.value ? 'opacity-100' : 'opacity-0',
-                      )}
+                      className={cn('ml-auto', value === field.value ? 'opacity-100' : 'opacity-0')}
                     />
                   </CommandItem>
                 ))}

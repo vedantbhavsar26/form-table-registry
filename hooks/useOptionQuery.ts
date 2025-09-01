@@ -14,9 +14,6 @@ export const useOptionQuery = (
     queryKey: useOptionKey.name(name, { filter, fn: fn?.toString() }).queryKey,
     queryFn: async () => (await fn?.()) || [],
     select: (data) => [...new Set(data)],
-    staleTime: 1000 * 60 * 60, // 1 hour
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchOnMount: false,
+    staleTime: 1000 * 60, // 1 minute
   });
 };
