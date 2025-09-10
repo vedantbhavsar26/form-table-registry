@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { cn } from '@/lib/data-table/utils';
+import { cn } from '@/lib/form-field/utils';
 import { BaseFieldProps, OptionType } from '@/lib/form-field/form-field';
 import { useOptionQuery } from '@/hooks/useOptionQuery';
 
@@ -27,7 +27,7 @@ export default function ToggleGroupComponent({
     <ToggleGroup
       type='single'
       variant='outline'
-      className={cn('w-full flex flex-wrap overflow-x-auto', className)}
+      className={cn('flex w-full flex-wrap overflow-x-auto', className)}
       {...props}
       value={props.value}
       onValueChange={(value) => {
@@ -36,7 +36,7 @@ export default function ToggleGroupComponent({
     >
       {optionsQuery.data.map(({ label, icon: Icon, value, wrapperFn }) => (
         <ToggleGroupItem
-          className={cn('rounded-md p-2 min-w-max', itemClassName, {
+          className={cn('h-max min-w-max p-2', itemClassName, {
             'text-muted-foreground': props.value !== value,
           })}
           value={value}
@@ -45,7 +45,7 @@ export default function ToggleGroupComponent({
           {wrapperFn ? (
             wrapperFn({ label, icon: Icon, value })
           ) : (
-            <div className={'flex items-center gap-2  justify-between w-full  '}>
+            <div className={'flex w-full items-center justify-between gap-2'}>
               <span className={'flex items-center gap-2'}>
                 {Icon && <Icon />} {label}
               </span>

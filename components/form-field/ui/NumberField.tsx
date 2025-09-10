@@ -27,8 +27,8 @@ export const NumberField = ({
       <Input
         {...field}
         type='number'
-        className={cn({
-          '-me-px h-full min-h-9 rounded-e-none ps-10 shadow-none text-center ': withControls,
+        className={cn(field.className, {
+          '-me-px h-full min-h-9 rounded-e-none ps-10 shadow-none text-center  ': withControls,
         })}
       />
       {withControls && (

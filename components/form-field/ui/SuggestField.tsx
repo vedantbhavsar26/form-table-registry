@@ -16,34 +16,48 @@ import { useOptionQuery } from '@/hooks/useOptionQuery';
 import { createSyntheticInputChange } from '@/lib/form-field/utils';
 import { buttonVariants } from '@/components/form-field/ui/button';
 import { useDebounceState } from '@/hooks/useDebounceState';
-type Props<T extends string> = BaseFieldProps & {
-  selectedValue: T;
 
+type Props = BaseFieldProps & {
+  id?: string;
   options: OptionType;
-  fallbackFn?: (value: string) => ReactNode;
+  fallbackFn?: (
+    value: string,
+    onSelectItem: (opt: { label: string; value: string }) => void,
+  ) => ReactNode;
 };
 
-export function SuggestInput<T extends string>({
-  selectedValue,
+export function SuggestInput({
   onChange,
   name,
   value,
   options,
   fallbackFn,
   placeholder = 'Search...',
+  id = name,
   ...fields
-}: Props<T>) {
+}: Props) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useDebounceState<string>();
-  const items = useOptionQuery(() => options(searchQuery), name, { q: searchQuery });
+  const items = useOptionQuery(() => options(searchQuery), id, {
+    q: searchQuery,
+  });
+
   const [customOptions, setCustomOptions] = useState<baseOption[]>([]);
   const ref = useRef<HTMLInputElement>(null);
 
   const opts = useMemo(
-    () => [
-      ...customOptions.filter((e) => e.value.startsWith(searchQuery || '')),
-      ...(items.data || []),
-    ],
+    () =>
+      [...customOptions, ...(items.data || [])]
+        .filter((e) => e.label.toLowerCase().startsWith(searchQuery?.toLowerCase() || ''))
+        .reduce<baseOption[]>((acc, item) => {
+          const existing = acc.find((e) => e.value === item.value);
+          if (existing) {
+            existing.label = item.label;
+          } else {
+            acc.push(item);
+          }
+          return acc;
+        }, []),
     [customOptions, items.data, searchQuery],
   );
 
@@ -58,23 +72,24 @@ export function SuggestInput<T extends string>({
       ),
     [opts],
   );
+
   const [customValue, setCustomValue] = useState<string>(labels?.[value]);
 
-  const onSelectItem = (inputValue: string, isNew: boolean = false) => {
-    onChange(createSyntheticInputChange(name, inputValue));
+  const onSelectItem = (opt: { label: string; value: string }, isNew: boolean = false) => {
+    onChange(createSyntheticInputChange(name, opt.value));
     if (isNew) {
-      setCustomOptions((prev) => [...prev, { label: inputValue, value: inputValue }]);
-      setCustomValue(inputValue);
+      setCustomOptions((prev) => [...prev, opt]);
+      setCustomValue(opt.value);
     } else {
-      setCustomValue(labels?.[inputValue]);
+      setCustomValue(labels?.[opt.value]);
     }
     setOpen(false);
   };
 
   return (
-    <div className='flex items-center'>
+    <div className='flex items-center bg-transparent'>
       <Popover open={open} onOpenChange={setOpen}>
-        <Command shouldFilter={false}>
+        <Command shouldFilter={false} className={'bg-transparent'}>
           <PopoverAnchor asChild>
             <CommandPrimitive.Input
               asChild
@@ -108,30 +123,30 @@ export function SuggestInput<T extends string>({
             <CommandList>
               {items.isPending && (
                 <CommandPrimitive.Loading>
-                  <div className='p-4 flex justify-center items-center gap-1'>
+                  <div className='flex items-center justify-center gap-1 p-4'>
                     <Loader2 className={'animate-spin'} size={18} /> Loading...
                   </div>
                 </CommandPrimitive.Loading>
               )}
               {(opts?.length || 0) > 0 && !items.isPending ? (
                 <CommandGroup>
-                  {opts?.map(({ label, value, icon: Icon, wrapperFn }) => (
+                  {opts?.map(({ label, value: optValue, icon: Icon, wrapperFn }) => (
                     <CommandItem
-                      key={value}
-                      value={value}
+                      key={optValue}
+                      value={optValue}
                       onMouseDown={(e) => e.preventDefault()}
-                      onSelect={(value) => onSelectItem(value)}
+                      onSelect={(s_v) => onSelectItem({ label: s_v, value: optValue })}
                     >
                       <Check
                         className={cn(
                           'mr-2 h-4 w-4',
-                          selectedValue === value ? 'opacity-100' : 'opacity-0',
+                          value === optValue ? 'opacity-100' : 'opacity-0',
                         )}
                       />
                       {wrapperFn ? (
-                        wrapperFn({ label, icon: Icon, value })
+                        wrapperFn({ label, icon: Icon, value: optValue })
                       ) : (
-                        <div className={'flex items-center gap-2  justify-between w-full  '}>
+                        <div className={'flex w-full items-center justify-between gap-2'}>
                           <span className={'flex items-center gap-2'}>
                             {Icon && <Icon />} {label}
                           </span>
@@ -144,7 +159,9 @@ export function SuggestInput<T extends string>({
               {!items.isPending ? (
                 searchQuery ? (
                   fallbackFn ? (
-                    fallbackFn(searchQuery)
+                    <CommandEmpty className={'!p-0'}>
+                      {fallbackFn(searchQuery, onSelectItem)}
+                    </CommandEmpty>
                   ) : (
                     <CommandEmpty
                       className={buttonVariants({
@@ -152,7 +169,13 @@ export function SuggestInput<T extends string>({
                         className: 'w-full cursor-pointer',
                       })}
                       onClick={() => {
-                        onSelectItem(searchQuery, true);
+                        onSelectItem(
+                          {
+                            label: searchQuery,
+                            value: searchQuery,
+                          },
+                          true,
+                        );
                       }}
                     >
                       create &quot;{searchQuery}&quot;

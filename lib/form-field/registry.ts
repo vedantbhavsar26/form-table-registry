@@ -32,7 +32,7 @@ export const fieldComponents = {
   password: PasswordField,
 } as const;
 
-export const baseClassName = 'bg-input';
+export const baseClassName = '!bg-input/30 placeholder:!text-primary !text-primary';
 
 type FieldComponents = typeof fieldComponents;
 type keyofFieldComponents = keyof FieldComponents;
