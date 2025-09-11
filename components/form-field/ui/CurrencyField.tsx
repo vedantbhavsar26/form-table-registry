@@ -1,31 +1,73 @@
-import React from 'react';
-import { Group, Input, NumberField } from 'react-aria-components';
+import React, { useState } from 'react';
 import { BaseFieldProps } from '@/lib/form-field/form-field';
-import { cn } from '@/lib/utils';
+import { createSyntheticInputChange } from '@/lib/form-field/utils';
+import { Input } from '@/components/ui/input';
 
-export const CurrencyField: React.FC<
-  BaseFieldProps & {
-    formatOptions?: Intl.NumberFormatOptions;
+const moneyFormatter = Intl.NumberFormat('en-IN', {
+  currency: 'INR',
+  style: 'currency',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+export const CurrencyField: React.FC<BaseFieldProps> = ({ ...field }) => {
+  const [displayValue, setDisplayValue] = useState<string>(
+    field.value ? moneyFormatter.format(Number(field.value)) : '',
+  );
+
+  function parseToNumber(input: string): number | null {
+    // allow decimals directly, don’t force paise
+    const clean = input.replace(/[^0-9.]/g, '');
+    if (!clean) return null;
+    return Number(clean);
   }
-> = ({
-  formatOptions = {
-    style: 'currency',
-    currency: 'INR',
-    currencySign: 'accounting',
-  },
-  className,
-  ...props
-}) => (
-  <NumberField {...props} formatOptions={formatOptions}>
-    <div className='*:not-first:mt-2'>
-      <Group
-        className={cn(
-          'border-input  outline-none data-focus-within:border-ring data-focus-within:ring-ring/50 data-focus-within:has-aria-invalid:ring-destructive/20 dark:data-focus-within:has-aria-invalid:ring-destructive/40 data-focus-within:has-aria-invalid:border-destructive relative inline-flex h-9 w-full items-center overflow-hidden rounded-md border text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] data-disabled:opacity-50 data-focus-within:ring-[3px]',
-          className,
-        )}
-      >
-        <Input className=' text-foreground flex-1 px-3 py-2 !text-sm tabular-nums' />
-      </Group>
-    </div>
-  </NumberField>
-);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    let raw = e.target.value;
+
+    // Strip everything except digits and .
+    raw = raw.replace(/[^0-9.]/g, '');
+
+    // Prevent multiple decimals (keep only the first)
+    const parts = raw.split('.');
+    if (parts.length > 2) {
+      raw = parts[0] + '.' + parts.slice(1).join('');
+    }
+
+    setDisplayValue(raw);
+
+    const parsed = parseToNumber(raw);
+    field.onChange(createSyntheticInputChange(field.name, parsed ?? ''));
+  }
+
+  function handleBlur() {
+    field.onBlur();
+    const parsed = parseToNumber(displayValue);
+    if (parsed !== null && !isNaN(parsed)) {
+      setDisplayValue(moneyFormatter.format(parsed));
+    } else {
+      setDisplayValue('');
+    }
+  }
+
+  function handleFocus() {
+    // strip formatting so user edits raw value
+    const parsed = parseToNumber(displayValue);
+    if (parsed !== null && !isNaN(parsed)) {
+      setDisplayValue(String(parsed));
+    }
+  }
+
+  return (
+    <Input
+      type='text'
+      inputMode='decimal'
+      pattern='[0-9]*'
+      {...field}
+      value={displayValue}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      onFocus={handleFocus}
+    />
+  );
+};

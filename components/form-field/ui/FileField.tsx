@@ -11,6 +11,11 @@ export const FileField = ({
   display?: 'COMPACT' | 'FULL';
 }) => {
   return (
-    <ImageDropZone {...field} accept={field.accept} multiple={field.multiple} display={display} />
+    <ImageDropZone
+      {...field}
+      accept={field.accept}
+      multiple={field.multiple}
+      display={display}
+    />
   );
 };

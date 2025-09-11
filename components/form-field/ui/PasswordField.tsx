@@ -97,7 +97,10 @@ export default function PasswordField({
           </div>
 
           {/* Password strength description */}
-          <p id={`${id}-description`} className='text-foreground mb-2 text-sm font-medium'>
+          <p
+            id={`${id}-description`}
+            className='text-foreground mb-2 text-sm font-medium'
+          >
             {getStrengthText(strengthScore)}. Must contain:
           </p>
 
@@ -105,9 +108,17 @@ export default function PasswordField({
             {strength.map((req, index) => (
               <li key={index} className='flex items-center gap-2'>
                 {req.met ? (
-                  <CheckIcon size={16} className='text-emerald-500' aria-hidden='true' />
+                  <CheckIcon
+                    size={16}
+                    className='text-emerald-500'
+                    aria-hidden='true'
+                  />
                 ) : (
-                  <XIcon size={16} className='text-muted-foreground/80' aria-hidden='true' />
+                  <XIcon
+                    size={16}
+                    className='text-muted-foreground/80'
+                    aria-hidden='true'
+                  />
                 )}
                 <span
                   className={`text-xs ${req.met ? 'text-emerald-600' : 'text-muted-foreground'}`}

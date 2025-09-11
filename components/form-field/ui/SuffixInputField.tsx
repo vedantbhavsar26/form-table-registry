@@ -23,14 +23,17 @@ export default function SuffixInputField({
       </span>
       <Input
         id={id}
-        className={cn('-me-px h-full min-h-9 !rounded-e-none ps-8 shadow-none', className)}
+        className={cn(
+          '-me-px h-full min-h-9 !rounded-e-none ps-8 shadow-none',
+          className,
+        )}
         type={type}
         placeholder='0.00'
         {...props}
       />
       <span
         className={cn(
-          'text-muted-foreground border-input -z-10 inline-flex h-full w-max items-center rounded-e-md border text-sm whitespace-nowrap',
+          'text-muted-foreground border-input -z-10 inline-flex h-full min-h-9 w-max items-center rounded-e-md border text-sm whitespace-nowrap',
           {
             'opacity-50': isDisabled,
             'bg-secondary px-3': typeof suffix === 'string',

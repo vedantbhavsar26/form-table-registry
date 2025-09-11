@@ -1,6 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import { debounce } from 'lodash-es';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Command,
@@ -23,7 +27,11 @@ export const ComboboxField: React.FC<
     options: (searchQuery: string | undefined) => Options;
     noResultFallBack?: React.ReactNode;
   }
-> = ({ noResultFallBack = 'No Result found.', options: optionFn, ...field }) => {
+> = ({
+  noResultFallBack = 'No Result found.',
+  options: optionFn,
+  ...field
+}) => {
   const [searchQuery, setSearchQuery] = useState<string>();
   const optionsQuery = useOptionQuery(() => optionFn(searchQuery), field.name, {
     q: searchQuery,
@@ -44,21 +52,27 @@ export const ComboboxField: React.FC<
               variant='outline'
               role='combobox'
               className={cn(
-                'justify-between ',
+                'justify-between',
                 field.className,
                 !field.value && 'text-muted-foreground',
               )}
             >
               {field.value ? (
-                optionsQuery.data?.find((opt) => opt.value === field.value)?.label
+                optionsQuery.data?.find((opt) => opt.value === field.value)
+                  ?.label
               ) : (
-                <span className={'max-w-32 truncate'}>Select {field.label}</span>
+                <span className={'max-w-32 truncate'}>
+                  Select {field.label}
+                </span>
               )}
               <ChevronsUpDown className='opacity-50' />
             </Button>
           </FormControl>
         </PopoverTrigger>
-        <PopoverContent className='w-[var(--radix-popover-trigger-width)] p-0' align='center'>
+        <PopoverContent
+          className='w-[var(--radix-popover-trigger-width)] p-0'
+          align='center'
+        >
           <Command>
             <CommandInput
               placeholder={field.placeholder}
@@ -80,29 +94,40 @@ export const ComboboxField: React.FC<
               ) : null}
 
               <CommandGroup>
-                {optionsQuery.data?.map(({ label, value, icon: Icon, wrapperFn }) => (
-                  <CommandItem
-                    value={label}
-                    key={value}
-                    className={' *:w-full'}
-                    onSelect={() => {
-                      field.onChange(createSyntheticInputChange(field.name, value));
-                    }}
-                  >
-                    {wrapperFn ? (
-                      wrapperFn({ label, icon: Icon, value })
-                    ) : (
-                      <div className={'flex items-center gap-2  justify-between w-full  '}>
-                        <span className={'flex items-center gap-2'}>
-                          {Icon && <Icon />} {label}
-                        </span>
-                      </div>
-                    )}
-                    <Check
-                      className={cn('ml-auto', value === field.value ? 'opacity-100' : 'opacity-0')}
-                    />
-                  </CommandItem>
-                ))}
+                {optionsQuery.data?.map(
+                  ({ label, value, icon: Icon, wrapperFn }) => (
+                    <CommandItem
+                      value={label}
+                      key={value}
+                      className={'*:w-full'}
+                      onSelect={() => {
+                        field.onChange(
+                          createSyntheticInputChange(field.name, value),
+                        );
+                      }}
+                    >
+                      {wrapperFn ? (
+                        wrapperFn({ label, icon: Icon, value })
+                      ) : (
+                        <div
+                          className={
+                            'flex w-full items-center justify-between gap-2'
+                          }
+                        >
+                          <span className={'flex items-center gap-2'}>
+                            {Icon && <Icon />} {label}
+                          </span>
+                        </div>
+                      )}
+                      <Check
+                        className={cn(
+                          'ml-auto',
+                          value === field.value ? 'opacity-100' : 'opacity-0',
+                        )}
+                      />
+                    </CommandItem>
+                  ),
+                )}
               </CommandGroup>
             </CommandList>
           </Command>

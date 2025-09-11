@@ -3,7 +3,9 @@ export async function getFile(fileId: string): Promise<File> {
   return new File([], fileId);
 }
 
-export const getPublicFileUrl = async (fileId: string | undefined | null): Promise<string> => {
+export const getPublicFileUrl = async (
+  fileId: string | undefined | null,
+): Promise<string> => {
   if (!fileId) return '';
   throw new Error('Not implemented');
 };

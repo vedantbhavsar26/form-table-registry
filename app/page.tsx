@@ -4,7 +4,7 @@ import { buttonVariants } from '@/components/form-field/ui/button';
 
 export default function Home() {
   return (
-    <div className={'grid gap-4 container mx-auto py-20 '}>
+    <div className={'container mx-auto grid gap-4 py-20'}>
       <h2>List</h2>
       {registryUi.map((e) => (
         <Link
@@ -16,7 +16,10 @@ export default function Home() {
         </Link>
       ))}
 
-      <Link href={'/form-field'} className={buttonVariants({ variant: 'default' })}>
+      <Link
+        href={'/form-field'}
+        className={buttonVariants({ variant: 'default' })}
+      >
         Form Field Example
       </Link>
     </div>

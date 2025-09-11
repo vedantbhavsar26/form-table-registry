@@ -38,7 +38,9 @@ export function exportTableToCSV<TData>(
 
   const columns = table
     .getAllColumns()
-    .filter((column) => column.getIsVisible() && !excludeColumns.includes(column.id))
+    .filter(
+      (column) => column.getIsVisible() && !excludeColumns.includes(column.id),
+    )
     .filter((column) => column.id !== 'select' && column.id !== 'actions');
 
   // Create CSV headers
@@ -84,7 +86,9 @@ type ValueMapFN = {
   value: unknown;
 };
 export const ValuesMap = {
-  string: ({ value }: ValueMapFN) => <span>{String(value).replaceAll('_', ' ') || 'N/A'}</span>,
+  string: ({ value }: ValueMapFN) => (
+    <span>{String(value).replaceAll('_', ' ') || 'N/A'}</span>
+  ),
   boolean: ({
     value,
     falseLabel,
@@ -100,7 +104,9 @@ export const ValuesMap = {
 
   number: ({ value, fixed = 3 }: ValueMapFN & { fixed: number }) => (
     <span>
-      {new Intl.NumberFormat('en-IN').format(Number(Number(value).toFixed(fixed))) || 'N/A'}
+      {new Intl.NumberFormat('en-IN').format(
+        Number(Number(value).toFixed(fixed)),
+      ) || 'N/A'}
     </span>
   ),
 
@@ -123,11 +129,11 @@ export const ValuesMap = {
 
   datetime: ({ value }: ValueMapFN) => {
     const dateValue = new Date(String(value));
-    return format(dateValue, 'eee dd MMM yyyy hh:mm:ss a');
+    return format(dateValue, 'dd-MM-yyyy hh:mm a');
   },
   time: ({ value }: ValueMapFN) => {
     const dateValue = new Date(String(value));
-    return format(dateValue, 'hh:mm:ss a');
+    return format(dateValue, 'hh:mm a');
   },
   interval: ({ value }: ValueMapFN) => {
     const [hours, minutes, seconds] = String(value).split(':').map(Number);
@@ -228,10 +234,17 @@ export function formatToTitleCase(input: string): string {
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .split(' ');
 
-  return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+  return words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 }
-export function toInrCurrency(...value: (number | null | undefined | string)[]): string {
-  const totalValue = value.reduce<number>((acc, curr) => acc + Number(curr || 0), 0);
+export function toInrCurrency(
+  ...value: (number | null | undefined | string)[]
+): string {
+  const totalValue = value.reduce<number>(
+    (acc, curr) => acc + Number(curr || 0),
+    0,
+  );
   return totalValue.toLocaleString('en-IN', {
     style: 'currency',
     currency: 'INR',
@@ -254,8 +267,10 @@ export function getCommonPinningStyles<TData>({
   withBorder?: boolean;
 }): React.CSSProperties {
   const isPinned = column.getIsPinned();
-  const isLastLeftPinnedColumn = isPinned === 'left' && column.getIsLastColumn('left');
-  const isFirstRightPinnedColumn = isPinned === 'right' && column.getIsFirstColumn('right');
+  const isLastLeftPinnedColumn =
+    isPinned === 'left' && column.getIsLastColumn('left');
+  const isFirstRightPinnedColumn =
+    isPinned === 'right' && column.getIsFirstColumn('right');
 
   return {
     boxShadow: withBorder
@@ -276,7 +291,10 @@ export function getCommonPinningStyles<TData>({
 }
 
 export function getFilterOperators(filterVariant: FilterVariant) {
-  const operatorMap: Record<FilterVariant, { label: string; value: FilterOperator }[]> = {
+  const operatorMap: Record<
+    FilterVariant,
+    { label: string; value: FilterOperator }[]
+  > = {
     text: dataTableConfig.textOperators,
     number: dataTableConfig.numericOperators,
     range: dataTableConfig.numericOperators,
@@ -305,6 +323,8 @@ export function getValidFilters<TData>(
       filter.operator === 'isNotEmpty' ||
       (Array.isArray(filter.value)
         ? filter.value.length > 0
-        : filter.value !== '' && filter.value !== null && filter.value !== undefined),
+        : filter.value !== '' &&
+          filter.value !== null &&
+          filter.value !== undefined),
   );
 }

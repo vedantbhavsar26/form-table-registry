@@ -35,7 +35,9 @@ export function createSyntheticInputChange(
   };
 }
 
-export const generateZodJSX = (zodSchema: Record<'shape', Record<string, unknown>>): ReactNode => {
+export const generateZodJSX = (
+  zodSchema: Record<'shape', Record<string, unknown>>,
+): ReactNode => {
   const str = () => {
     const str = Object.keys(zodSchema.shape).reduce((acc, curr) => {
       acc += `<FormItem control={form.control} name={'${curr}'} label={'${formatToTitleCase(curr)}'} render={'text'} />`;
@@ -44,7 +46,11 @@ export const generateZodJSX = (zodSchema: Record<'shape', Record<string, unknown
     return str;
   };
 
-  return <Button onClick={() => navigator.clipboard.writeText(str())}>Copy Zod JSX</Button>;
+  return (
+    <Button onClick={() => navigator.clipboard.writeText(str())}>
+      Copy Zod JSX
+    </Button>
+  );
 };
 
 export function formatToTitleCase(input: string): string {
@@ -55,5 +61,7 @@ export function formatToTitleCase(input: string): string {
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .split(' ');
 
-  return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+  return words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 }

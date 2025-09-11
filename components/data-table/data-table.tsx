@@ -30,7 +30,10 @@ function DataTableInner<TData>({
   ...props
 }: DataTableProps<TData>) {
   return (
-    <div className={cn('flex w-full flex-col gap-2.5 overflow-auto', className)} {...props}>
+    <div
+      className={cn('flex w-full flex-col gap-2.5 overflow-auto', className)}
+      {...props}
+    >
       {children}
       <div className='overflow-hidden rounded-md border'>
         <Table>
@@ -47,7 +50,10 @@ function DataTableInner<TData>({
                   >
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -56,7 +62,10 @@ function DataTableInner<TData>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
@@ -65,14 +74,20 @@ function DataTableInner<TData>({
                         ...getCommonPinningStyles({ column: cell.column }),
                       }}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={table.getAllColumns().length} className='h-24 text-center'>
+                <TableCell
+                  colSpan={table.getAllColumns().length}
+                  className='h-24 text-center'
+                >
                   No results.
                 </TableCell>
               </TableRow>
@@ -82,13 +97,18 @@ function DataTableInner<TData>({
       </div>
       <div className='flex flex-col justify-end gap-2.5'>
         {showPagination && <DataTablePagination table={table} />}
-        {actionBar && table.getFilteredSelectedRowModel().rows.length > 0 && actionBar}
+        {actionBar &&
+          table.getFilteredSelectedRowModel().rows.length > 0 &&
+          actionBar}
       </div>
     </div>
   );
 }
 
-function areEqual<TData>(prev: DataTableProps<TData>, next: DataTableProps<TData>) {
+function areEqual<TData>(
+  prev: DataTableProps<TData>,
+  next: DataTableProps<TData>,
+) {
   if (prev.table !== next.table) return false;
   // Re-render when TanStack table state changes
   if (prev.table.getState() !== next.table.getState()) return false;
@@ -125,4 +145,7 @@ function areEqual<TData>(prev: DataTableProps<TData>, next: DataTableProps<TData
   return true;
 }
 
-export const DataTable = React.memo(DataTableInner, areEqual) as typeof DataTableInner;
+export const DataTable = React.memo(
+  DataTableInner,
+  areEqual,
+) as typeof DataTableInner;

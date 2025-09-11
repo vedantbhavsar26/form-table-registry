@@ -32,7 +32,8 @@ export const fieldComponents = {
   password: PasswordField,
 } as const;
 
-export const baseClassName = '!bg-input/30 placeholder:!text-primary !text-primary';
+export const baseClassName =
+  '!bg-input/30 placeholder:!text-primary !text-primary';
 
 type FieldComponents = typeof fieldComponents;
 type keyofFieldComponents = keyof FieldComponents;
@@ -51,14 +52,13 @@ export type WithProps<T extends keyofFieldComponents> =
 
 export type FieldType = keyof typeof fieldComponents;
 
-export const fieldVariants = cva<{ render: Partial<Record<FieldType, string>> }>(
-  'flex gap-2 flex-col bg-transparent',
-  {
-    variants: {
-      render: {
-        boolean:
-          'flex items-center rounded-md border p-2 mt-5.5 justify-end flex-row-reverse space-x-2',
-      },
+export const fieldVariants = cva<{
+  render: Partial<Record<FieldType, string>>;
+}>('flex gap-2 flex-col bg-transparent', {
+  variants: {
+    render: {
+      boolean:
+        'flex items-center rounded-md border p-2 mt-5.5 justify-end flex-row-reverse space-x-2',
     },
   },
-);
+});

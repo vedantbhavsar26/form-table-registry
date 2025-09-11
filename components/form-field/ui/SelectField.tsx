@@ -32,7 +32,9 @@ export const SelectField: React.FC<
         customOnChange?.(e);
       }}
     >
-      <SelectTrigger className={cn(' w-full', field.className, classNames?.trigger)}>
+      <SelectTrigger
+        className={cn('w-full', field.className, classNames?.trigger)}
+      >
         <SelectValue placeholder={field.placeholder} />
       </SelectTrigger>
       <SelectContent>
@@ -56,7 +58,9 @@ export const SelectField: React.FC<
                 {wrapperFn ? (
                   wrapperFn({ label, icon: Icon, value })
                 ) : (
-                  <div className={'flex items-center gap-2  justify-between w-full  '}>
+                  <div
+                    className={'flex w-full items-center justify-between gap-2'}
+                  >
                     <span className={'flex items-center gap-2'}>
                       {Icon && <Icon />} {label}
                     </span>

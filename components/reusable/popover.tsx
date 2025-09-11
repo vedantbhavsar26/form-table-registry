@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Popover as ShadcnPopover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Popover as ShadcnPopover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
 type PopoverProps = {
@@ -26,11 +30,16 @@ export const Popover: React.FC<PopoverProps> = ({
   }, []);
   return (
     <ShadcnPopover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild={typeof trigger !== 'string'} className={cn(className?.trigger)}>
+      <PopoverTrigger
+        asChild={typeof trigger !== 'string'}
+        className={cn(className?.trigger)}
+      >
         {trigger}
       </PopoverTrigger>
       <PopoverContent className={cn(className?.content)} align={align}>
-        {typeof children === 'function' ? children(() => setOpen(false)) : children}
+        {typeof children === 'function'
+          ? children(() => setOpen(false))
+          : children}
       </PopoverContent>
     </ShadcnPopover>
   );

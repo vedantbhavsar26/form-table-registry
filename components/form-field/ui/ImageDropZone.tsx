@@ -24,7 +24,9 @@ import { createSyntheticInputChange } from '@/lib/form-field/utils';
 import { cn } from '@/lib/utils';
 
 // Function to determine file type
-export const getFileType = (fileType: string | null): 'image' | 'pdf' | 'other' => {
+export const getFileType = (
+  fileType: string | null,
+): 'image' | 'pdf' | 'other' => {
   if (!fileType) return 'other';
   if (fileType.startsWith('image/')) return 'image';
   if (fileType === 'application/pdf') return 'pdf';
@@ -34,7 +36,8 @@ export const getFileType = (fileType: string | null): 'image' | 'pdf' | 'other' 
 // Function to get appropriate icon for file type
 const getFileIcon = (fileType: string) => {
   if (fileType.startsWith('image/')) return <ImageUpIcon className='size-6' />;
-  if (fileType === 'application/pdf') return <FileTextIcon className='size-6' />;
+  if (fileType === 'application/pdf')
+    return <FileTextIcon className='size-6' />;
   return <FileIcon className='size-6' />;
 };
 
@@ -64,7 +67,9 @@ export default function ImageDropZone({
       getInputProps,
     },
   ] = useFileUpload({
-    accept: props.accept || 'image/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt',
+    accept:
+      props.accept ||
+      'image/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt',
     multiple: props.multiple || false,
     maxSize,
     onFilesChange: (files) => {
@@ -74,7 +79,9 @@ export default function ImageDropZone({
           props.onChange(createSyntheticInputChange(props.name || '', files));
           return;
         }
-        props.onChange(createSyntheticInputChange(props.name || '', files.at(0)));
+        props.onChange(
+          createSyntheticInputChange(props.name || '', files.at(0)),
+        );
       }
     },
   });
@@ -173,7 +180,8 @@ export default function ImageDropZone({
             }}
             aria-label='Remove file'
           >
-            {deleteMutation.isPending && deleteMutation.variables === file.id ? (
+            {deleteMutation.isPending &&
+            deleteMutation.variables === file.id ? (
               <Loader2 className='size-4 animate-spin' />
             ) : (
               <XIcon className='size-4' aria-hidden='true' />
@@ -233,7 +241,9 @@ export default function ImageDropZone({
                       ) : (
                         <FileIcon className='size-4' />
                       )}
-                      <span className='max-w-[10rem] truncate'>{file.file?.name}</span>
+                      <span className='max-w-[10rem] truncate'>
+                        {file.file?.name}
+                      </span>
                       <button
                         type='button'
                         className='focus-visible:ring-ring/50 text-muted-foreground hover:bg-muted hover:text-foreground z-10 flex size-5 items-center justify-center rounded-full transition-[color,box-shadow] outline-none focus-visible:ring-[2px]'
@@ -246,7 +256,8 @@ export default function ImageDropZone({
                         }}
                         aria-label='Remove file'
                       >
-                        {deleteMutation.isPending && deleteMutation.variables === file.id ? (
+                        {deleteMutation.isPending &&
+                        deleteMutation.variables === file.id ? (
                           <Loader2 className='size-3.5 animate-spin' />
                         ) : (
                           <XIcon className='size-3.5' aria-hidden='true' />
@@ -285,7 +296,10 @@ export default function ImageDropZone({
                 </div>
                 <p className='text-muted-foreground truncate text-sm'>
                   {props.placeholder || (
-                    <>Drop your {props.multiple ? 'files' : 'file'} here or click to browse</>
+                    <>
+                      Drop your {props.multiple ? 'files' : 'file'} here or
+                      click to browse
+                    </>
                   )}
                 </p>
               </div>
@@ -338,7 +352,10 @@ export default function ImageDropZone({
                 </div>
                 <p className='mb-1.5 text-sm font-medium'>
                   {props.placeholder || (
-                    <>Drop your {props.multiple ? 'files' : 'file'} here or click to browse</>
+                    <>
+                      Drop your {props.multiple ? 'files' : 'file'} here or
+                      click to browse
+                    </>
                   )}
                 </p>
                 <p className='text-muted-foreground text-xs'>
@@ -350,7 +367,7 @@ export default function ImageDropZone({
         )}
       </div>
       {!isCompact && (props.multiple || files.length === 0) ? (
-        <div className={cn('mb-2 flex justify-between ', className)}>
+        <div className={cn('mb-2 flex justify-between', className)}>
           <Button
             type={'button'}
             onClick={async () => {
@@ -360,9 +377,13 @@ export default function ImageDropZone({
                 for (const type of item.types) {
                   if (type.startsWith('image/')) {
                     const blob = await item.getType(type);
-                    file = new File([blob], `clipboard-image-${Date.now()}-.png`, {
-                      type: blob.type,
-                    });
+                    file = new File(
+                      [blob],
+                      `clipboard-image-${Date.now()}-.png`,
+                      {
+                        type: blob.type,
+                      },
+                    );
                   }
                 }
               }
@@ -389,7 +410,10 @@ export default function ImageDropZone({
       ) : null}
 
       {errors.length > 0 && (
-        <div className='text-destructive flex items-center gap-1 text-xs' role='alert'>
+        <div
+          className='text-destructive flex items-center gap-1 text-xs'
+          role='alert'
+        >
           <AlertCircleIcon className='size-3 shrink-0' />
           <span>{errors[0]}</span>
         </div>

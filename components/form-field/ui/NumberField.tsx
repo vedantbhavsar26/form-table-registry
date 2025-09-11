@@ -12,14 +12,19 @@ export const NumberField = ({
   withControls?: boolean;
 }) => {
   return (
-    <div className={cn('relative z-10 flex items-center rounded-md shadow-xs', field.className)}>
+    <div
+      className={cn(
+        'relative z-10 flex items-center rounded-md shadow-xs',
+        field.className,
+      )}
+    >
       {withControls && (
         <Button
           variant={'ghost'}
           type={'button'}
           onClick={() => field.onChange(Number(field.value) - 1)}
           size={'sm'}
-          className='text-muted-foreground  absolute inset-y-0 start-0 mr-2 flex h-full items-center justify-center ps-3 text-sm'
+          className='text-muted-foreground absolute inset-y-0 start-0 mr-2 flex h-full items-center justify-center ps-3 text-sm'
         >
           <MinusIcon />
         </Button>
@@ -28,7 +33,8 @@ export const NumberField = ({
         {...field}
         type='number'
         className={cn(field.className, {
-          '-me-px h-full min-h-9 rounded-e-none ps-10 shadow-none text-center  ': withControls,
+          '-me-px h-full min-h-9 rounded-e-none ps-10 text-center shadow-none':
+            withControls,
         })}
       />
       {withControls && (
@@ -38,7 +44,7 @@ export const NumberField = ({
           size={'sm'}
           onClick={() => field.onChange(Number(field.value) + 1)}
           className={cn(
-            'text-muted-foreground  absolute inset-y-0 end-0  flex h-full items-center justify-center  text-sm',
+            'text-muted-foreground absolute inset-y-0 end-0 flex h-full items-center justify-center text-sm',
             {
               'opacity-50': field.disabled,
             },

@@ -87,14 +87,20 @@ export function FormPanel() {
     combobox: {
       options: async (q) => {
         await new Promise((resolve) => setTimeout(resolve, 100));
-        if (q) return opts.filter((e) => e.label.toLowerCase().startsWith(q.toLowerCase()));
+        if (q)
+          return opts.filter((e) =>
+            e.label.toLowerCase().startsWith(q.toLowerCase()),
+          );
         return [];
       },
     },
     suggest: {
       options: async (q) => {
         await new Promise((resolve) => setTimeout(resolve, 100));
-        if (q) return opts.filter((e) => e.label.toLowerCase().startsWith(q.toLowerCase()));
+        if (q)
+          return opts.filter((e) =>
+            e.label.toLowerCase().startsWith(q.toLowerCase()),
+          );
         return [];
       },
       shouldCloseOnNoItems: true,
@@ -117,16 +123,27 @@ export function FormPanel() {
   >;
 
   return (
-    <Form {...form} className={'mx-auto container grid grid-cols-3 gap-2 py-20'}>
-      {keys.map((key, index) => (
-        <FormItem
-          key={key}
-          control={form.control}
-          name={key}
-          // @ts-expect-error type error
-          render={key}
-          props={options[key as never]}
-        />
+    <Form
+      {...form}
+      className={'container mx-auto grid grid-cols-3 gap-2 py-20'}
+    >
+      {keys.map((key) => (
+        <div key={key} className={'grid gap-1'}>
+          <FormItem
+            control={form.control}
+            name={key}
+            // @ts-expect-error type error
+            render={key}
+            props={options[key as never]}
+          />
+          <pre
+            className={
+              'bg-muted flex h-max min-h-9 items-center justify-center overflow-x-auto rounded-md p-1 text-sm'
+            }
+          >
+            <code>{JSON.stringify(form.watch(key) || 'N/A', null, 2)}</code>
+          </pre>
+        </div>
       ))}
     </Form>
   );

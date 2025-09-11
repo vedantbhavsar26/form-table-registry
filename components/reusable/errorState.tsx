@@ -21,16 +21,23 @@ function isObject(val: unknown): val is Record<string, unknown> {
   return typeof val === 'object' && val !== null;
 }
 
-function extractNestedError(obj: Record<string, unknown>): Record<string, unknown> | undefined {
-  if ('error' in obj && isObject(obj.error)) return obj.error as Record<string, unknown>;
-  if ('data' in obj && isObject(obj.data)) return obj.data as Record<string, unknown>;
+function extractNestedError(
+  obj: Record<string, unknown>,
+): Record<string, unknown> | undefined {
+  if ('error' in obj && isObject(obj.error))
+    return obj.error as Record<string, unknown>;
+  if ('data' in obj && isObject(obj.data))
+    return obj.data as Record<string, unknown>;
   if (
     'response' in obj &&
     isObject(obj.response) &&
     'data' in obj.response &&
     isObject((obj.response as Record<string, unknown>).data)
   ) {
-    return (obj.response as Record<string, unknown>).data as Record<string, unknown>;
+    return (obj.response as Record<string, unknown>).data as Record<
+      string,
+      unknown
+    >;
   }
   return undefined;
 }
@@ -45,7 +52,8 @@ export function getErrorInfo(error: unknown): {
   if (error instanceof Error) {
     return {
       message: error.message || 'Unexpected error occurred.',
-      details: error.stack && error.stack !== error.message ? error.stack : undefined,
+      details:
+        error.stack && error.stack !== error.message ? error.stack : undefined,
     };
   }
 
@@ -108,13 +116,21 @@ export default function ErrorState({
     <div className={cn('w-full', className)}>
       <Alert variant='destructive' className={cn(compact ? 'py-2' : 'py-4')}>
         <AlertTriangle aria-hidden className='col-start-1 text-red-500' />
-        <AlertTitle className={cn(compact ? 'text-sm' : 'text-base')}>{finalTitle}</AlertTitle>
+        <AlertTitle className={cn(compact ? 'text-sm' : 'text-base')}>
+          {finalTitle}
+        </AlertTitle>
         <AlertDescription>
-          <p className={cn(compact ? 'text-xs' : 'text-sm')}>{finalDescription}</p>
+          <p className={cn(compact ? 'text-xs' : 'text-sm')}>
+            {finalDescription}
+          </p>
 
           <div className={cn('mt-3 flex flex-wrap items-center gap-2')}>
             {onRetryAction && (
-              <Button size={compact ? 'sm' : 'sm'} variant='secondary' onClick={onRetryAction}>
+              <Button
+                size={compact ? 'sm' : 'sm'}
+                variant='secondary'
+                onClick={onRetryAction}
+              >
                 <RefreshCw className={cn(compact ? 'h-3 w-3' : 'h-4 w-4')} />
                 <span className='ml-1'>{retryText}</span>
               </Button>
@@ -142,7 +158,9 @@ export default function ErrorState({
           </div>
 
           {info.code && (
-            <div className='text-muted-foreground mt-2 text-xs'>Error code: {info.code}</div>
+            <div className='text-muted-foreground mt-2 text-xs'>
+              Error code: {info.code}
+            </div>
           )}
 
           {showDetails && info.details && (

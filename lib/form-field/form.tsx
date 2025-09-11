@@ -19,9 +19,13 @@ export const Form = <
 }) => {
   return (
     <F {...props}>
-      {withDevTools && <DevTool control={props.control as Control} placement='top-right' />}
+      {withDevTools && (
+        <DevTool control={props.control as Control} placement='top-right' />
+      )}
       <form
-        onSubmit={props.handleSubmit(props.onSubmit || (() => {}), (error) => console.error(error))}
+        onSubmit={props.handleSubmit(props.onSubmit || (() => {}), (error) =>
+          console.error(error),
+        )}
         className={cn('grid gap-2', props.className)}
       >
         {props.children}

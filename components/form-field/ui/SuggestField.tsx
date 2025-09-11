@@ -1,8 +1,12 @@
 import { cn } from '@/lib/utils';
 import { Command as CommandPrimitive } from 'cmdk';
 import { Check, Loader2 } from 'lucide-react';
-import React, { ReactNode, useMemo, useRef, useState } from 'react';
-import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover';
+import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+} from '@/components/ui/popover';
 import {
   Command,
   CommandEmpty,
@@ -11,7 +15,11 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
-import { BaseFieldProps, baseOption, OptionType } from '@/lib/form-field/form-field';
+import {
+  BaseFieldProps,
+  baseOption,
+  OptionType,
+} from '@/lib/form-field/form-field';
 import { useOptionQuery } from '@/hooks/useOptionQuery';
 import { createSyntheticInputChange } from '@/lib/form-field/utils';
 import { buttonVariants } from '@/components/form-field/ui/button';
@@ -24,6 +32,7 @@ type Props = BaseFieldProps & {
     value: string,
     onSelectItem: (opt: { label: string; value: string }) => void,
   ) => ReactNode;
+  getInitialValue?: (value: string) => Promise<baseOption | undefined>;
 };
 
 export function SuggestInput({
@@ -33,22 +42,40 @@ export function SuggestInput({
   options,
   fallbackFn,
   placeholder = 'Search...',
+  getInitialValue,
   id = name,
   ...fields
 }: Props) {
   const [open, setOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useDebounceState<string>();
+  const [searchQuery, setSearchQuery] = useDebounceState<string>(value);
   const items = useOptionQuery(() => options(searchQuery), id, {
     q: searchQuery,
   });
-
   const [customOptions, setCustomOptions] = useState<baseOption[]>([]);
+
+  useEffect(() => {
+    if (value) {
+      getInitialValue?.(value).then((opt) => {
+        if (opt) {
+          setCustomOptions((value) => [opt, ...value]);
+          setCustomValue(opt.label);
+        }
+      });
+    }
+  }, []);
+
   const ref = useRef<HTMLInputElement>(null);
 
   const opts = useMemo(
     () =>
       [...customOptions, ...(items.data || [])]
-        .filter((e) => e.label.toLowerCase().startsWith(searchQuery?.toLowerCase() || ''))
+        .filter(
+          (e) =>
+            e.label
+              .toLowerCase()
+              .startsWith(searchQuery?.toLowerCase() || '') ||
+            e.value.toLowerCase() === value,
+        )
         .reduce<baseOption[]>((acc, item) => {
           const existing = acc.find((e) => e.value === item.value);
           if (existing) {
@@ -72,10 +99,12 @@ export function SuggestInput({
       ),
     [opts],
   );
-
   const [customValue, setCustomValue] = useState<string>(labels?.[value]);
 
-  const onSelectItem = (opt: { label: string; value: string }, isNew: boolean = false) => {
+  const onSelectItem = (
+    opt: { label: string; value: string },
+    isNew: boolean = false,
+  ) => {
     onChange(createSyntheticInputChange(name, opt.value));
     if (isNew) {
       setCustomOptions((prev) => [...prev, opt]);
@@ -114,7 +143,10 @@ export function SuggestInput({
             asChild
             onOpenAutoFocus={(e) => e.preventDefault()}
             onInteractOutside={(e) => {
-              if (e.target instanceof Element && e.target.hasAttribute('cmdk-input')) {
+              if (
+                e.target instanceof Element &&
+                e.target.hasAttribute('cmdk-input')
+              ) {
                 e.preventDefault();
               }
             }}
@@ -130,30 +162,38 @@ export function SuggestInput({
               )}
               {(opts?.length || 0) > 0 && !items.isPending ? (
                 <CommandGroup>
-                  {opts?.map(({ label, value: optValue, icon: Icon, wrapperFn }) => (
-                    <CommandItem
-                      key={optValue}
-                      value={optValue}
-                      onMouseDown={(e) => e.preventDefault()}
-                      onSelect={(s_v) => onSelectItem({ label: s_v, value: optValue })}
-                    >
-                      <Check
-                        className={cn(
-                          'mr-2 h-4 w-4',
-                          value === optValue ? 'opacity-100' : 'opacity-0',
+                  {opts?.map(
+                    ({ label, value: optValue, icon: Icon, wrapperFn }) => (
+                      <CommandItem
+                        key={optValue}
+                        value={optValue}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onSelect={(s_v) =>
+                          onSelectItem({ label: s_v, value: optValue })
+                        }
+                      >
+                        <Check
+                          className={cn(
+                            'mr-2 h-4 w-4',
+                            value === optValue ? 'opacity-100' : 'opacity-0',
+                          )}
+                        />
+                        {wrapperFn ? (
+                          wrapperFn({ label, icon: Icon, value: optValue })
+                        ) : (
+                          <div
+                            className={
+                              'flex w-full items-center justify-between gap-2'
+                            }
+                          >
+                            <span className={'flex items-center gap-2'}>
+                              {Icon && <Icon />} {label}
+                            </span>
+                          </div>
                         )}
-                      />
-                      {wrapperFn ? (
-                        wrapperFn({ label, icon: Icon, value: optValue })
-                      ) : (
-                        <div className={'flex w-full items-center justify-between gap-2'}>
-                          <span className={'flex items-center gap-2'}>
-                            {Icon && <Icon />} {label}
-                          </span>
-                        </div>
-                      )}
-                    </CommandItem>
-                  ))}
+                      </CommandItem>
+                    ),
+                  )}
                 </CommandGroup>
               ) : null}
               {!items.isPending ? (

@@ -9,10 +9,18 @@ export { Form } from '../../../lib/form-field/form';
 export { FormItem } from '../../../lib/form-field/formItem';
 
 // Registry
-export { fieldComponents, fieldVariants, type FieldType } from '../../../lib/form-field/registry';
+export {
+  fieldComponents,
+  fieldVariants,
+  type FieldType,
+} from '../../../lib/form-field/registry';
 
 // Types
-export type { OptionType, BaseFieldProps, SelectFieldData } from '@/lib/form-field/form-field';
+export type {
+  OptionType,
+  BaseFieldProps,
+  SelectFieldData,
+} from '@/lib/form-field/form-field';
 
 // Hooks
 export { useOptionQuery } from '../../../hooks/useOptionQuery';

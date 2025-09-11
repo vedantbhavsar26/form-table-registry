@@ -105,7 +105,11 @@ export const Index: Record<string, any> ={`;
   );
 
   rimraf.sync(path.join(REGISTRY_PATH, REGISTRY_FILENAME));
-  await fs.writeFile(path.join(REGISTRY_PATH, REGISTRY_FILENAME), registryJSON, 'utf8');
+  await fs.writeFile(
+    path.join(REGISTRY_PATH, REGISTRY_FILENAME),
+    registryJSON,
+    'utf8',
+  );
 
   // Build /src/__registry__/index.tsx
   rimraf.sync(path.join(REGISTRY_PATH, 'index.tsx'));

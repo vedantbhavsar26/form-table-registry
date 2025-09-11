@@ -1,4 +1,9 @@
-import { Control, ControllerRenderProps, FieldPath, FieldValues } from 'react-hook-form';
+import {
+  Control,
+  ControllerRenderProps,
+  FieldPath,
+  FieldValues,
+} from 'react-hook-form';
 import React, { FC } from 'react';
 import {
   FormControl,
@@ -46,7 +51,10 @@ type KeyedRenderCase<K extends FieldType> = K extends unknown
         : { props: WithProps<K> })
   : never;
 
-type RenderType<TFieldValues extends FieldValues, TName extends FieldPath<TFieldValues>> =
+type RenderType<
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+> =
   | NoRenderCase
   | FunctionRenderCase<TFieldValues, TName>
   | KeyedRenderCase<FieldType>;
@@ -72,13 +80,17 @@ type FormItemComponentProps<
     required?: boolean;
   } & BaseFieldType;
 
-const getDefaultValue = (render: FieldType | FC<ControllerRenderProps>, label: string) => {
+const getDefaultValue = (
+  render: FieldType | FC<ControllerRenderProps>,
+  label: string,
+) => {
   if (typeof render === 'function') return `Enter ` + `${label.toLowerCase()}`;
 
   if (['suggest', 'select', 'dateTime'].includes(render))
     return `Select ` + `${label.toLowerCase()}`;
 
-  if (['file'].includes(render)) return `Upload or Drop ` + `${label.toLowerCase()}`;
+  if (['file'].includes(render))
+    return `Upload or Drop ` + `${label.toLowerCase()}`;
 
   return `Enter ` + `${label.toLowerCase()}`;
 };
@@ -116,18 +128,24 @@ export const FormItem = <
       render={({ field }) => {
         const InputComponent = (typeof render === 'string'
           ? getInputComponent(render)
-          : render) as unknown as React.FC<ControllerRenderProps<TFieldValues, TName>>;
+          : render) as unknown as React.FC<
+          ControllerRenderProps<TFieldValues, TName>
+        >;
 
         return (
           <FormItemBase
             {...divProps}
-            className={cn('flex w-full flex-col items-start gap-2', divProps.className)}
+            className={cn(
+              'flex w-full flex-col items-start gap-2',
+              divProps.className,
+            )}
           >
             {noLabel ? (
               <div
                 className={cn(
                   'flex w-full flex-col gap-2',
-                  typeof render === 'string' && fieldVariants({ render: render }),
+                  typeof render === 'string' &&
+                    fieldVariants({ render: render }),
                   containerClassName,
                 )}
               >
@@ -145,7 +163,8 @@ export const FormItem = <
               <div
                 className={cn(
                   'flex w-full flex-col gap-2',
-                  typeof render === 'string' && fieldVariants({ render: render }),
+                  typeof render === 'string' &&
+                    fieldVariants({ render: render }),
                   containerClassName,
                 )}
               >
@@ -154,7 +173,9 @@ export const FormItem = <
                   {required ? (
                     <small className={'text-destructive text-base'}>*</small>
                   ) : (
-                    <small className={'text-muted-foreground text-sm'}>(optional)</small>
+                    <small className={'text-muted-foreground text-sm'}>
+                      (optional)
+                    </small>
                   )}
                 </FormLabel>
                 <FormControl>
