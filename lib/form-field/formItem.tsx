@@ -48,10 +48,10 @@ type KeyedRenderCase<K extends FieldType> = K extends unknown
 	? {
 			render: K;
 		} & (WithProps<K> extends undefined
-			? { props?: undefined }
+			? object
 			: AllPropsOptional<WithProps<K>> extends true
-				? { props?: WithProps<K> }
-				: { props: WithProps<K> })
+				? WithProps<K> | {}
+				: WithProps<K>)
 	: never;
 
 type RenderType<
@@ -70,15 +70,31 @@ interface FormItemProps<
 	name: TName;
 	description?: string;
 	label?: string;
-	containerClassName?: string;
 }
+
+const defaultValueMap = {
+	select: (label) => `Select ${label}`,
+	dateTime: (label) => `Select ${label}`,
+	number: (_) => "0",
+	currency: (_) => "₹0.00",
+} as Record<FieldType, (label: string) => string>;
+
+const getDefaultValue = (render: unknown, label: string) => {
+	if (typeof render === "function") return `Enter ${label.toLowerCase()}`;
+	if (typeof render !== "string") return `Enter ${label.toLowerCase()}`;
+
+	if (render in defaultValueMap) {
+		return defaultValueMap[render as keyof typeof defaultValueMap](label);
+	}
+
+	return `Enter ${label.toLowerCase()}`;
+};
 
 export type FormItemComponentProps<
 	TFieldValues extends FieldValues = FieldValues,
 	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = FormItemProps<TFieldValues, TName> &
 	RenderType<TFieldValues, TName> & {
-		required?: boolean;
 		className?: {
 			root?: string;
 			content?: string;
@@ -102,19 +118,6 @@ const Component = <T extends FieldValues = FieldValues>({
 		return children;
 	}
 };
-const getDefaultPlaceholder = (
-	render: FieldType | FC<ControllerRenderProps>,
-	label: string,
-) => {
-	if (typeof render === "function") return `Enter ${label.toLowerCase()}`;
-
-	if (["select", "dateTime"].includes(render))
-		return `Select ${label.toLowerCase()}`;
-
-	if (["file"].includes(render)) return `Upload or Drop ${label.toLowerCase()}`;
-
-	return `Enter ${label.toLowerCase()}`;
-};
 
 export const FormItem = <
 	TFieldValues extends FieldValues = FieldValues,
@@ -125,20 +128,11 @@ export const FormItem = <
 	description,
 	label = formatToTitleCase(name),
 	render = "text",
-	containerClassName,
-
-	// @ts-expect-error type error
-	placeholder = getDefaultPlaceholder(render, label),
+	placeholder = getDefaultValue(render, label),
 	noLabel = false,
 	className,
-	required = true,
 	...divProps
 }: FormItemComponentProps<TFieldValues, TName>) => {
-	const getProps = () => {
-		if ("props" in divProps) {
-			return divProps.props || {};
-		}
-	};
 	const getIsRequired = () => {
 		const ctrl = "control" in control ? control.control : control;
 		const context = ctrl._options.context as unknown;
@@ -155,7 +149,7 @@ export const FormItem = <
 				}
 			}
 		}
-		return required;
+		return false;
 	};
 
 	const isRequired = getIsRequired();
@@ -173,7 +167,7 @@ export const FormItem = <
 					const InputComponent = (typeof render === "string"
 						? getInputComponent(render)
 						: render) as unknown as React.FC<
-						ControllerRenderProps<TFieldValues, TName>
+						ControllerRenderProps<TFieldValues, TName> & Record<string, unknown>
 					>;
 
 					return (
@@ -182,7 +176,7 @@ export const FormItem = <
 							{...divProps}
 							className={cn(
 								"flex w-full flex-col items-start gap-2",
-								className,
+								className?.root,
 							)}
 						>
 							<FieldContent
@@ -190,7 +184,7 @@ export const FormItem = <
 									"flex w-full flex-col gap-2",
 									typeof render === "string" &&
 										fieldVariants({ render: render }),
-									containerClassName,
+									className?.content,
 								)}
 							>
 								{noLabel ? null : (
@@ -211,9 +205,7 @@ export const FormItem = <
 								)}
 								<InputComponent
 									{...field}
-									{...getProps()}
-									// @ts-expect-error type error
-									className={cn(baseClassName, getProps()?.className)}
+									className={cn(baseClassName, className)}
 									label={label}
 									id={field.name}
 									data-invalid={fieldState.invalid}

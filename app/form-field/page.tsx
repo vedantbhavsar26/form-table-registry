@@ -143,7 +143,7 @@ export function FormPanel() {
 				name={"text"}
 				label={"Text"}
 				render={"text"}
-			/>{" "}
+			/>
 			<FormItem
 				control={form.control}
 				name={"number"}
@@ -173,7 +173,7 @@ export function FormPanel() {
 				name={"select"}
 				label={"Select"}
 				render={"select"}
-				props={options.select}
+				options={options.select.options}
 			/>{" "}
 			<FormItem
 				control={form.control}
@@ -186,7 +186,7 @@ export function FormPanel() {
 				name={"suggest"}
 				label={"Suggest"}
 				render={"suggest"}
-				props={{ options: () => opts }}
+				options={() => opts}
 			/>{" "}
 			<FormItem
 				control={form.control}
@@ -199,14 +199,14 @@ export function FormPanel() {
 				name={"combobox"}
 				label={"Combobox"}
 				render={"combobox"}
-				props={{ options: () => opts }}
+				options={() => opts}
 			/>{" "}
 			<FormItem
 				control={form.control}
 				name={"toggle"}
 				label={"Toggle"}
 				render={"toggle"}
-				props={{ options: () => opts }}
+				options={() => opts}
 			/>{" "}
 			<FormItem
 				control={form.control}
@@ -219,6 +219,7 @@ export function FormPanel() {
 				name={"password"}
 				label={"Password"}
 				render={"password"}
+				display={"FULL"}
 			/>{" "}
 		</Form>
 	);
