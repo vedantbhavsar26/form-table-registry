@@ -1,58 +1,57 @@
-import React from 'react';
-import { Input } from '@/components/ui/input';
-import { BaseFieldProps } from '@/lib/form-field/form-field';
-import { cn } from '@/lib/form-field/utils';
-import { Button } from '@/components/ui/button';
-import { MinusIcon, PlusIcon } from 'lucide-react';
+import { MinusIcon, PlusIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupInput,
+} from "@/components/ui/input-group";
+import type { BaseFieldProps } from "@/lib/form-field/form-field";
+import { cn } from "@/lib/form-field/utils";
 
 export const NumberField = ({
-  withControls = false,
-  ...field
+	withControls = false,
+	...field
 }: BaseFieldProps & {
-  withControls?: boolean;
+	withControls?: boolean;
 }) => {
-  return (
-    <div
-      className={cn(
-        'relative z-10 flex items-center rounded-md shadow-xs',
-        field.className,
-      )}
-    >
-      {withControls && (
-        <Button
-          variant={'ghost'}
-          type={'button'}
-          onClick={() => field.onChange(Number(field.value) - 1)}
-          size={'sm'}
-          className='text-muted-foreground absolute inset-y-0 start-0 mr-2 flex h-full items-center justify-center ps-3 text-sm'
-        >
-          <MinusIcon />
-        </Button>
-      )}
-      <Input
-        {...field}
-        type='number'
-        className={cn(field.className, {
-          '-me-px h-full min-h-9 rounded-e-none ps-10 text-center shadow-none':
-            withControls,
-        })}
-      />
-      {withControls && (
-        <Button
-          type={'button'}
-          variant={'ghost'}
-          size={'sm'}
-          onClick={() => field.onChange(Number(field.value) + 1)}
-          className={cn(
-            'text-muted-foreground absolute inset-y-0 end-0 flex h-full items-center justify-center text-sm',
-            {
-              'opacity-50': field.disabled,
-            },
-          )}
-        >
-          <PlusIcon />
-        </Button>
-      )}
-    </div>
-  );
+	return (
+		<InputGroup
+			className={cn(
+				"!px-0 relative flex items-center overflow-hidden rounded-md shadow-xs",
+				field.className,
+			)}
+		>
+			{withControls && (
+				<InputGroupAddon>
+					<Button
+						variant={"ghost"}
+						type={"button"}
+						onClick={() => field.onChange(Number(field.value) - 1)}
+						size={"sm"}
+					>
+						<MinusIcon />
+					</Button>
+				</InputGroupAddon>
+			)}
+			<InputGroupInput
+				{...field}
+				type="number"
+				className={cn(field.className, {
+					withControls,
+				})}
+			/>
+			{withControls && (
+				<InputGroupAddon align={"inline-end"}>
+					<Button
+						type={"button"}
+						variant={"ghost"}
+						size={"sm"}
+						onClick={() => field.onChange(Number(field.value) + 1)}
+					>
+						<PlusIcon />
+					</Button>
+				</InputGroupAddon>
+			)}
+		</InputGroup>
+	);
 };

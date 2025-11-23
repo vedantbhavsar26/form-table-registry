@@ -28,6 +28,8 @@
         "input",
         "checkbox",
         "select",
+        "input-group",
+        "field",
         "popover",
         "command",
         "textarea",
@@ -106,6 +108,10 @@
           "type": "registry:component"
         },
         {
+          "path": "hooks/form-field/useForm.tsx",
+          "type": "registry:hook"
+        },
+        {
           "path": "hooks/use-file-upload.ts",
           "type": "registry:hook"
         },
@@ -169,12 +175,15 @@
         "@tanstack/react-table",
         "@tanstack/react-query",
         "@lukemorales/query-key-factory",
+        "nuqs",
         "cmdk",
         "date-fns",
         "react-day-picker",
-        "clsx",
-        "tailwind-merge"
+        "clsx@2.1.1",
+        "tailwind-merge",
+        "@supabase/postgrest-js"
       ],
+      "devDependencies": [],
       "registryDependencies": [
         "table",
         "dropdown-menu",
@@ -199,6 +208,10 @@
         },
         {
           "path": "components/data-table/data-table-date-filter.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "components/data-table/data-table-advance-date-filter.tsx",
           "type": "registry:component"
         },
         {
@@ -244,6 +257,18 @@
         {
           "path": "lib/data-table/parsers.ts",
           "type": "registry:lib"
+        },
+        {
+          "path": "hooks/data-table/use-callback-ref.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "hooks/data-table/use-data-table.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "hooks/data-table/use-debounced-callback.ts",
+          "type": "registry:hook"
         },
         {
           "path": "components/data-table/button.tsx",

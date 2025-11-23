@@ -1,17 +1,17 @@
-import { Textarea } from '@/components/ui/textarea';
-import React from 'react';
-import { BaseFieldProps } from '@/lib/form-field/form-field';
+import type React from "react";
+import { Textarea } from "@/components/ui/textarea";
+import type { BaseFieldProps } from "@/lib/form-field/form-field";
 
 export const TextAreaField: React.FC<
-  BaseFieldProps & {
-    rows?: number;
-    cols?: number;
-  }
+	BaseFieldProps & {
+		rows?: number;
+		cols?: number;
+	}
 > = (field) => {
-  return (
-    <Textarea
-      className='bg-secondary w-full rounded-md border p-2'
-      {...field}
-    />
-  );
+	return (
+		<Textarea
+			className="w-full rounded-md border bg-secondary p-2"
+			{...field}
+		/>
+	);
 };
