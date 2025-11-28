@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/popover";
 import type { BaseFieldProps } from "@/lib/form-field/form-field";
 import { createSyntheticInputChange } from "@/lib/form-field/utils";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/form-field/utils";
 
 const parseDate = (val: unknown): Date | undefined => {
 	if (!val && val !== 0) return undefined;

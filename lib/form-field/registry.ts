@@ -9,6 +9,7 @@ import PasswordField from "@/components/form-field/ui/PasswordField";
 import { SelectField } from "@/components/form-field/ui/SelectField";
 import { SuffixField } from "@/components/form-field/ui/SuffixField";
 import { SuggestInput } from "@/components/form-field/ui/SuggestField";
+import SwitchField from "@/components/form-field/ui/SwitchField";
 import { TextField } from "@/components/form-field/ui/TextField";
 import ToggleGroupComponent from "@/components/form-field/ui/ToggleGroup";
 import { TextAreaField } from "@/components/form-field/ui/textAreaField";
@@ -26,6 +27,7 @@ export const fieldComponents = {
 	dateTime: DateTimeField,
 	combobox: ComboboxField,
 	toggle: ToggleGroupComponent,
+	switch: SwitchField,
 	currency: CurrencyField,
 	password: PasswordField,
 } as const;
@@ -57,6 +59,7 @@ export const fieldVariants = cva<{
 		render: {
 			boolean:
 				"flex items-center rounded-md border p-2 mt-5.5 justify-end flex-row-reverse space-x-2",
+			switch: "flex items-center justify-end",
 		},
 	},
 });

@@ -14,6 +14,10 @@ export const registryUi: Registry["items"] = [
 				type: "registry:component",
 			},
 			{
+				path: "components/form-field/ui/SwitchField.tsx",
+				type: "registry:component",
+			},
+			{
 				path: "components/form-field/ui/ComboboxField.tsx",
 				type: "registry:component",
 			},

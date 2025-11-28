@@ -37,7 +37,7 @@ export const NumberField = ({
 				{...field}
 				type="number"
 				className={cn(field.className, {
-					withControls,
+					"text-center": withControls,
 				})}
 			/>
 			{withControls && (

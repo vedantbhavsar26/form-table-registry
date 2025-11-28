@@ -1,5 +1,4 @@
-import type React from "react";
-import type { FC, PropsWithChildren } from "react";
+import React, { FC, type PropsWithChildren, useMemo } from "react";
 import {
 	type Control,
 	Controller,
@@ -27,6 +26,7 @@ import {
 } from "@/lib/form-field/registry";
 import { cn, formatToTitleCase } from "@/lib/form-field/utils";
 
+/* --- Types (kept equivalent, slightly formatted) --- */
 type FunctionRenderCase<
 	TFieldValues extends FieldValues = FieldValues,
 	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -37,7 +37,7 @@ type NoRenderCase = {
 	render?: undefined;
 };
 type AllPropsOptional<T> = keyof T extends never
-	? true // handle empty object
+	? true
 	: {
 				[K in keyof T]-?: object extends Pick<T, K> ? true : false;
 			}[keyof T] extends true
@@ -72,22 +72,21 @@ interface FormItemProps<
 	label?: string;
 }
 
-const defaultValueMap = {
+/* --- Defaults and helpers --- */
+const defaultValueMap: Partial<Record<FieldType, (label: string) => string>> = {
 	select: (label) => `Select ${label}`,
 	dateTime: (label) => `Select ${label}`,
-	number: (_) => "0",
-	currency: (_) => "₹0.00",
-} as Record<FieldType, (label: string) => string>;
+	number: () => "0",
+	currency: () => "₹0.00",
+};
 
 const getDefaultValue = (render: unknown, label: string) => {
+	// if render is a custom component function, default to "Enter <label>"
 	if (typeof render === "function") return `Enter ${label.toLowerCase()}`;
 	if (typeof render !== "string") return `Enter ${label.toLowerCase()}`;
 
-	if (render in defaultValueMap) {
-		return defaultValueMap[render as keyof typeof defaultValueMap](label);
-	}
-
-	return `Enter ${label.toLowerCase()}`;
+	const mapFn = defaultValueMap[render as FieldType];
+	return mapFn ? mapFn(label) : `Enter ${label.toLowerCase()}`;
 };
 
 export type FormItemComponentProps<
@@ -104,21 +103,28 @@ export type FormItemComponentProps<
 		noLabel?: boolean;
 	} & Omit<BaseFieldType, "className">;
 
+/* --- Small wrapper to optionally render Form when passed UseFormReturn --- */
 const Component = <T extends FieldValues = FieldValues>({
 	children,
 	control,
 }: PropsWithChildren<{ control: Control<T> | UseFormReturn<T> }>) => {
+	// If a UseFormReturn (object with 'control' prop) is passed, spread it into <Form />
 	if ("control" in control) {
 		return (
-			<Form {...control} className={"w-full"}>
+			<Form {...control} className="w-full">
 				{children}
 			</Form>
 		);
-	} else {
-		return children;
 	}
+	// Otherwise assume it's a Control and render children directly
+	return <>{children}</>;
 };
 
+/* --- Choose input component by key, fallback to text --- */
+const getInputComponent = (r: FieldType) =>
+	fieldComponents[r] || fieldComponents.text;
+
+/* --- Main exported component --- */
 export const FormItem = <
 	TFieldValues extends FieldValues = FieldValues,
 	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -133,7 +139,12 @@ export const FormItem = <
 	className,
 	...divProps
 }: FormItemComponentProps<TFieldValues, TName>) => {
-	const getIsRequired = () => {
+	// normalize control object (either Control or UseFormReturn)
+	const controlObj = "control" in control ? control.control : control;
+
+	/* Determine requiredness by inspecting zod schema in context (if present)
+       Memoized so it doesn't run on every render unless control changes. */
+	const isRequired = useMemo(() => {
 		const ctrl = "control" in control ? control.control : control;
 		const context = ctrl._options.context as unknown;
 		if (context && typeof context === "object" && "schema" in context) {
@@ -150,26 +161,28 @@ export const FormItem = <
 			}
 		}
 		return false;
-	};
+	}, [name, control]);
 
-	const isRequired = getIsRequired();
+	/* Memoize the input component chosen from registry or a provided render function */
+	// biome-ignore lint/correctness/useExhaustiveDependencies: function is rerendering
+	const InputComponent = useMemo(() => {
+		if (typeof render === "string")
+			return getInputComponent(render) as React.FC<
+				ControllerRenderProps<TFieldValues, TName> & Record<string, unknown>
+			>;
+		return render as React.FC<
+			ControllerRenderProps<TFieldValues, TName> & Record<string, unknown>
+		>;
+	}, [render?.toString()]);
 
-	const getInputComponent = (r: FieldType) => {
-		return fieldComponents[r] || fieldComponents.text;
-	};
+	const isRenderString = typeof render === "string";
 
 	return (
 		<Component control={control}>
 			<Controller
-				control={"control" in control ? control.control : control}
+				control={controlObj}
 				name={name}
 				render={({ field, fieldState }) => {
-					const InputComponent = (typeof render === "string"
-						? getInputComponent(render)
-						: render) as unknown as React.FC<
-						ControllerRenderProps<TFieldValues, TName> & Record<string, unknown>
-					>;
-
 					return (
 						<Field
 							data-invalid={fieldState.invalid}
@@ -180,43 +193,48 @@ export const FormItem = <
 							)}
 						>
 							<FieldContent
+								key={field.name}
 								className={cn(
 									"flex w-full flex-col gap-2",
-									typeof render === "string" &&
-										fieldVariants({ render: render }),
+									isRenderString && fieldVariants({ render: render }),
 									className?.content,
 								)}
 							>
-								{noLabel ? null : (
+								{!noLabel && (
 									<FieldLabel
 										data-invalid={fieldState.invalid}
 										htmlFor={field.name}
-										className={"w-max"}
+										className="w-max"
 									>
 										{divProps.icon} {formatToTitleCase(label)}{" "}
 										{isRequired ? (
-											<small className={"text-destructive text-sm"}>*</small>
+											<small className="text-destructive text-sm">*</small>
 										) : (
-											<small className={"text-muted-foreground text-sm"}>
+											<small className="text-muted-foreground text-sm">
 												(optional)
 											</small>
 										)}
 									</FieldLabel>
 								)}
+
 								<InputComponent
 									{...field}
-									className={cn(baseClassName, className)}
+									{...divProps}
+									key={field.name}
+									className={cn(baseClassName)}
 									label={label}
 									id={field.name}
 									data-invalid={fieldState.invalid}
 									placeholder={placeholder}
 								/>
 							</FieldContent>
+
 							{description && (
 								<FieldDescription data-invalid={fieldState.invalid}>
 									{description}
 								</FieldDescription>
 							)}
+
 							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
 						</Field>
 					);
